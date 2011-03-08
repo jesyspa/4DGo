@@ -2,6 +2,7 @@
 #define FDGO_INCLUDE_GOBAN_HPP
 
 #include "position.hpp"
+#include "score.hpp"
 
 typedef unsigned int uint;
 
@@ -11,7 +12,7 @@ class Goban {
 	~Goban();
 	void placeStone(bool black, Position pos);
 	void killGroup(Position pos);
-	uint calcScore();
+	Score makeScore();
 	char getIcon(Position pos);
 };
 
