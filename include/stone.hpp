@@ -12,6 +12,7 @@ class Stone {
 	~Stone();
     private:
 	Chain* chain_;
+	Intersection const* iPtr_;
 	const bool black_; // Otherwise white
 };
 
