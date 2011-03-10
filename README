@@ -1,0 +1,2 @@
+A four-dimensional goban. At the moment, there is no useful functionality, but
+running make in this directory should build successfully. 
