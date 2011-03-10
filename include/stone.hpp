@@ -10,9 +10,11 @@ class Stone {
     public:
 	Stone(Intersection* iPtr, bool black);
 	~Stone();
+	char getIcon();
     private:
 	Chain* chain_;
 	Intersection const* iPtr_;
+	char icon_;
 	const bool black_; // Otherwise white
 };
 

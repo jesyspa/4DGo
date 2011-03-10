@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
-#include <boost/program_options.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
+#include <boost/program_options.hpp>
 #include "io.hpp"
 #include "goban.hpp"
 #include "score.hpp"
@@ -16,6 +17,7 @@ const boost::regex IO::getScore("^score$");
 const boost::regex IO::exit("^exit$");
 
 IO::IO(int argc, char** argv) : goban_(0), blackTurn_(true), komi_(0.5) {
+	goban_ = new Goban(4);
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "show help message")
@@ -35,7 +37,7 @@ IO::IO(int argc, char** argv) : goban_(0), blackTurn_(true), komi_(0.5) {
 	}
 	std::cout << "Initialisation complete.\n";
 	std::cout << "The komi is " << komi_ << ".\n";
-	std::cout << "Enjoy the game.\n" << std::endl;
+	std::cout << "Enjoy the game.\n";
 }
 
 IO::~IO() {
@@ -48,27 +50,29 @@ void IO::giveControl() {
 }
 
 void IO::mainLoop() {
+	redraw();
 	std::string input;
 	if (!std::getline(std::cin, input))
 		throw ExcEOF();
 	try {
 		if (regex_match(input, pass)) {
-			std::cout << "Player has passed.\n";
+			blackTurn_ = !blackTurn_;
 		} else if (regex_match(input, move)) {
-			std::cout << "Player has moved.\n";
+			goban_->placeStone(blackTurn_, Position(input));
+			blackTurn_ = !blackTurn_;
 		} else if (regex_match(input, kill)) {
-			std::cout << "Player wants to kill something.\n";
+			goban_->killGroup(Position(input));
 		} else if (regex_match(input, getScore)) {
-			std::cout << "Player wants the score.\n";
+			newMsg(pColourUC() + "player wants the score.");
 		} else if (regex_match(input, exit)) {
 			BOOST_THROW_EXCEPTION(ExcSuccessExit());
 		} else {
-			std::cerr << "Unknown instruction.\n";
+			newMsg("Unknown instruction: " + input);
 		}
 	}
-	catch (boost::exception& e) {
-		redraw();
-		throw;
+	catch (ExcNonFatal& e) {
+		if (std::string const* msg = boost::get_error_info<err_msg>(e))
+			newMsg(std::string("Error: " + *msg));
 	}
 }
 
@@ -77,5 +81,33 @@ void IO::showScore(Score const& sc) {
 }
 
 void IO::redraw() {
-	BOOST_THROW_EXCEPTION(ExcNotImplemented());
+	// Print an empty goban.
+	std::cout << "\n\n\n|--------------------------|\n";
+	std::cout << "\n        A    B    C    D\n\n";
+	for (int a = 0; a < 4; ++a) { // Large horizontal
+		for (int b = 0; b < 4; ++b) { // Small horizontal
+			if (b == 2)
+				std::cout << "  " << 4-a << "   ";
+			else
+				std::cout << "      ";
+			for (int c = 0; c < 4; ++c) { // Large vertical
+				for (int d = 0; d < 4; ++d) // Small vertical
+					std::cout << goban_->getIcon(Position(c,3-a,d,3-b));
+				std::cout << " ";
+			}
+			std::cout << "\n";
+		}
+		std::cout << "\n";
+	}
+	std::list<std::string>::iterator it = msgList_.begin();
+	for ( ; it != msgList_.end(); ++it) {
+		std::cout << *it << "\n";
+	}
+	std::cout << "\n|--------------------------|\n\n";
+}
+
+void IO::newMsg(std::string msg) {
+	msgList_.push_back(msg);
+	if (msgList_.size() > 5)
+		msgList_.pop_front();
 }

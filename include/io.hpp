@@ -2,6 +2,8 @@
 #define FDGO_INCLUDE_IO_HPP
 
 #include <boost/regex.hpp>
+#include <list>
+#include <string>
 
 class Goban;
 struct Score;
@@ -18,10 +20,16 @@ class IO {
 	void mainLoop();
 	void showScore(Score const& sc);
 	void redraw();
+	void newMsg(std::string msg);
+	
+	std::string pColourUC() {
+		return blackTurn_ ? "Black " : "White ";
+	}
 
 	Goban* goban_;
 	bool blackTurn_;
 	float komi_;
+	std::list<std::string> msgList_;
 
 	static const boost::regex pass;
 	static const boost::regex move;
