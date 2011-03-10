@@ -13,12 +13,13 @@ class Chain {
 	Chain(Chain const&); 
 	Chain& operator=(Chain const&);
     public:
-	Chain();
 	Chain(Stone* st); // Create a chain from one stone.
-	addStone(Stone* st);
-	calcLiberties();
-	joinWith(Chain* ch);
+	void addStone(Stone* st);
+	bool checkLiberties();
+	void joinWith(Chain* ch);
+	void considerDying(); // DANGER! May cause object to poof!
     private:
+	bool const black_;
 	std::vector<Stone*> stonevec_;
 };
 

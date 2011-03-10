@@ -7,7 +7,8 @@ ADD_DEFINITIONS( " -ggdb -Wall -Wextra -pedantic -std=c++0x -Winline
 LINK_LIBRARIES( boost_program_options boost_regex )
 SET( PROJECT_SOURCE_FILES
 	${PROJECT_SOURCE_FILES}
-	main.cpp io.cpp goban.cpp intersection.cpp stone.cpp position.cpp
+	main.cpp io.cpp goban.cpp intersection.cpp stone.cpp chain.cpp
+	position.cpp
 	)
 
 ADD_EXECUTABLE( 4dgo ${PROJECT_SOURCE_FILES} )

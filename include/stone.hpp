@@ -1,9 +1,13 @@
 #ifndef FDGO_INCLUDE_STONE_HPP
 #define FDGO_INCLUDE_STONE_HPP
+
+#include <vector>
+
 class Chain;
 class Intersection;
 
 class Stone {
+	friend class Chain;
 	// Explicitly forbidden
 	Stone(Stone const&);
 	Stone& operator=(Stone const&);
@@ -12,9 +16,17 @@ class Stone {
 	~Stone();
 	char getIcon();
     private:
+	void connectToNeighbours();
+	void connectTo(Intersection* p);
+	bool isSameColour(Intersection* p);
+	void increaseNeighbourLiberties();
+	void increaseLiberty(Intersection* p);
+	void seeIfAnyoneIsDead();
+	void getChain(std::vector<Chain*>& chvec, Intersection* p);
 	Chain* chain_;
-	Intersection const* iPtr_;
+	Intersection* iPtr_;
 	char icon_;
+	int libs;
 	const bool black_; // Otherwise white
 };
 
