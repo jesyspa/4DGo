@@ -4,9 +4,9 @@
 #include "position.hpp"
 #include "score.hpp"
 #include "neighbours.hpp"
-#include "memory.hpp"
 
 class Intersection;
+class Memory;
 
 typedef unsigned int uint;
 
@@ -17,12 +17,13 @@ class Goban {
 	Goban(Goban const&);
 	Goban& operator=(Goban const&);
     public:
-	Goban(uint boardsize = 4);
+	Goban(uint boardsize, Memory& mem);
 	~Goban();
 	void placeStone(bool black, Position const& pos);
+	void removeStone(Position const& pos);
 	void killGroup(Position const& pos);
-	void noteStoneRemoval(Intersection* itr);
-	void pass(bool black);
+	void undo();
+	void noteStoneRemoval(Intersection* itr, bool black);
 	Score makeScore();
 	char getIcon(Position const& pos);
     private:
@@ -32,7 +33,9 @@ class Goban {
 	Intersection* iPtr_;
 	uint boardsize_;
 	uint boardarea_;
-	Memory mem_;
+	uint blackPrisoners_;
+	uint whitePrisoners_;
+	Memory& mem_;
 };
 
 #endif // Guard

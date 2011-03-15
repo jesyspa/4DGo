@@ -3,14 +3,13 @@ A four-dimensional goban.
 Currently implemented:
 - Playing of stones
 - Automatic removal of surrounded chains
-- Automatic logfile creation (log.txt)
+- Possibility to save
+- Undo
 
 Currently working on:
-- Undo
-- Better history system
+- Split into server and client
 
 Needs doing:
-- Split into server and client
 - Counting score
 - Graphical client
 

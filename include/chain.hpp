@@ -20,6 +20,7 @@ class Chain {
     public:
 	Chain(Stone* st); // Create a chain from one stone.
 	void addStone(Stone* st);
+	void removeStone(Stone* st);
 	void joinWith(Chain* ch);
 	void considerDying(bool forbid = false); // DANGER! May cause object to poof!
     private:

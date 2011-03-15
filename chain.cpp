@@ -1,4 +1,5 @@
 #include <vector>
+#include <iterator>
 #include "chain.hpp"
 #include "stone.hpp"
 #include "exception.hpp"
@@ -12,6 +13,7 @@ Chain::Chain(Stone* st) : black_(st->black_) {
 
 Chain::~Chain() {
 	for (uint i = 0; i < stonevec_.size(); ++i) {
+		stonevec_[i]->chain_ = 0;
 		delete stonevec_[i];
 	}
 }
@@ -19,6 +21,16 @@ Chain::~Chain() {
 void Chain::addStone(Stone* st) {
 	stonevec_.push_back(st);
 	st->chain_ = this;
+}
+
+void Chain::removeStone(Stone* st) {
+	std::vector<Stone*>::iterator it = stonevec_.begin();
+	while (it != stonevec_.end()) {
+		if (*it == st) {
+			stonevec_.erase(it);
+			break;
+		}
+	}
 }
 
 bool Chain::checkLiberties() {

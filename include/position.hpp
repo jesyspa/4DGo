@@ -7,6 +7,10 @@
 
 typedef unsigned int uint;
 
+//! \brief Contains coordinates on the goban.
+//!
+//! String should be of format A1a1.
+
 struct Position {
 	Position();
 	Position(std::string const& str);

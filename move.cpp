@@ -27,6 +27,8 @@ std::string Move::toString() {
 			ss << (black ? "B" : "W");
 			ss << " PASS";
 			break;
+		default:
+			ss << "Unknown move";
 	}
 	return ss.str();
 }

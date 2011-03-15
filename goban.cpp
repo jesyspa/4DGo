@@ -1,9 +1,13 @@
 #include "goban.hpp"
+#include "memory.hpp"
 #include "intersection.hpp"
+#include "stone.hpp"
+#include "memlock.hpp"
+#include "move.hpp"
 #include "exception.hpp"
 #include "neighbours.hpp"
 
-Goban::Goban(uint boardsize) {
+Goban::Goban(uint boardsize, Memory& mem) : blackPrisoners_(0), whitePrisoners_(0), mem_(mem) {
 	boardsize_ = boardsize = 4; // Let's not get too complex yet.
 	boardarea_ = boardsize_*boardsize_*boardsize_*boardsize_;
 	iPtr_ = new Intersection[boardarea_];
@@ -12,7 +16,6 @@ Goban::Goban(uint boardsize) {
 }
 
 Goban::~Goban() {
-	mem_.recording = false;
 	delete[] iPtr_;
 }
 
@@ -28,12 +31,28 @@ void Goban::killGroup(Position const& pos) {
 	BOOST_THROW_EXCEPTION(ExcNotImplemented());
 }
 
-void Goban::noteStoneRemoval(Intersection* itr) {
-	mem_.removeStone(getPosition(itr));
+void Goban::removeStone(Position const& pos) {
+	delete getIntersection(pos)->stone_;
 }
 
-void Goban::pass(bool black) {
-	mem_.pass(black);
+void Goban::undo() {
+	MemLock mlock(mem_);
+	Move lastmove = mem_.popLastMove();
+	if (lastmove.type != Move::play)
+		throw ExcNothingToUndo();
+	removeStone(lastmove.pos);
+	while (mem_.lastMoveType() == Move::remove) {
+		lastmove = mem_.popLastMove();
+		placeStone(!lastmove.black, lastmove.pos);
+	}
+}
+
+void Goban::noteStoneRemoval(Intersection* itr, bool black) {
+	mem_.removeStone(getPosition(itr));
+	if (black)
+		blackPrisoners_++;
+	else
+		whitePrisoners_++;
 }
 
 Score Goban::makeScore() {

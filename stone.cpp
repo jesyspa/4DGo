@@ -12,8 +12,12 @@ Stone::Stone(Intersection* iPtr, bool black) : chain_(0), iPtr_(iPtr), libs(8), 
 }
 
 Stone::~Stone() {
-	iPtr_->goban_->noteStoneRemoval(iPtr_);
+	iPtr_->goban_->noteStoneRemoval(iPtr_, black_);
 	iPtr_->stone_ = 0;
+	if (chain_) {
+		chain_->removeStone(this);
+		chain_->considerDying();
+	}
 	increaseNeighbourLiberties();
 }
 

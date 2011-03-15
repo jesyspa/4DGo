@@ -23,6 +23,7 @@ struct ExcSuccessExit : ExcFatal {
 
 struct ExcInvalidMove : ExcNonFatal {};
 struct ExcInvalidPos : ExcNonFatal {};
+struct ExcNothingToUndo : ExcNonFatal {};
 
 struct ExcNotImplemented : ExcFatal {
 	ExcNotImplemented() {

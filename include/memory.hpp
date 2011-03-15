@@ -2,11 +2,15 @@
 #define FDGO_INCLUDE_MEMORY_HPP
 
 #include <vector>
+#include <string>
 #include "move.hpp"
+
+class MemLock;
 
 //! \brief Stores the moves made.
 
 class Memory {
+	friend class MemLock;
     private:
 	// Should never be called.
 	Memory(Memory const&); 
@@ -17,10 +21,11 @@ class Memory {
 	void placeStone(bool black, Position const& pos);
 	void removeStone(Position const& pos);
 	void pass(bool black);
-	Move peekLastPlay();
+	void writeToDisk(std::string filename);
+	Move::MType lastMoveType();
 	Move popLastMove();
-	bool recording;
     private:
+	int locked_;
 	std::vector<Move> mvec_;
 };
 

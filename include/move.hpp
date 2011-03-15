@@ -12,7 +12,8 @@ class Move {
 	enum MType {
 		pass,
 		play,
-		remove
+		remove,
+		none
 	} type;
 	Move(); 
 	Move(Move const&); 

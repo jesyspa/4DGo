@@ -5,6 +5,7 @@
 #include <boost/program_options.hpp>
 #include "io.hpp"
 #include "goban.hpp"
+#include "memory.hpp"
 #include "score.hpp"
 #include "exception.hpp"
 
@@ -13,11 +14,14 @@ namespace po = boost::program_options;
 const boost::regex IO::pass("^pass$");
 const boost::regex IO::move("^[A-D][1-4][a-d][1-4]$");
 const boost::regex IO::kill("^kill [A-D][1-4][a-d][1-4]$");
+const boost::regex IO::undo("^undo$");
+const boost::regex IO::save("^save$");
 const boost::regex IO::getScore("^score$");
 const boost::regex IO::exit("^exit$");
 
-IO::IO(int argc, char** argv) : goban_(0), blackTurn_(true), komi_(0.5) {
-	goban_ = new Goban(4);
+IO::IO(int argc, char** argv) : mem_(0), goban_(0), blackTurn_(true), komi_(0.5) {
+	mem_ = new Memory;
+	goban_ = new Goban(4, *mem_);
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "show help message")
@@ -42,6 +46,7 @@ IO::IO(int argc, char** argv) : goban_(0), blackTurn_(true), komi_(0.5) {
 
 IO::~IO() {
 	delete goban_;
+	delete mem_;
 }
 
 void IO::giveControl() {
@@ -56,13 +61,21 @@ void IO::mainLoop() {
 		BOOST_THROW_EXCEPTION(ExcEOF());
 	try {
 		if (regex_match(input, pass)) {
-			goban_->pass(blackTurn_);
+			mem_->pass(blackTurn_);
+			newMsg(pColourUC() + "has passed.");
 			blackTurn_ = !blackTurn_;
 		} else if (regex_match(input, move)) {
 			goban_->placeStone(blackTurn_, Position(input));
 			blackTurn_ = !blackTurn_;
 		} else if (regex_match(input, kill)) {
 			goban_->killGroup(Position(input));
+		} else if (regex_match(input, undo)) {
+			goban_->undo();
+			blackTurn_ = !blackTurn_;
+			newMsg(pColourUC() + "has undone his move.");
+		} else if (regex_match(input, save)) {
+			mem_->writeToDisk("log.txt");
+			newMsg("Game saved.");
 		} else if (regex_match(input, getScore)) {
 			newMsg(pColourUC() + "player wants the score.");
 		} else if (regex_match(input, exit)) {
@@ -70,6 +83,9 @@ void IO::mainLoop() {
 		} else {
 			newMsg("Unknown instruction: " + input);
 		}
+	}
+	catch (ExcNothingToUndo& e) {
+		newMsg("No move to undo.");
 	}
 	catch (ExcNonFatal& e) {
 		if (std::string const* msg = boost::get_error_info<err_msg>(e))
@@ -100,11 +116,12 @@ void IO::redraw() {
 		}
 		std::cout << "\n";
 	}
+	std::cout << "\n|--------------------------|\n";
 	std::list<std::string>::iterator it = msgList_.begin();
 	for ( ; it != msgList_.end(); ++it) {
 		std::cout << *it << "\n";
 	}
-	std::cout << "\n|--------------------------|\n\n";
+	std::cout << "|--------------------------|\n\n";
 }
 
 void IO::newMsg(std::string msg) {
