@@ -1,5 +1,6 @@
 #include <vector>
 #include "stone.hpp"
+#include "goban.hpp"
 #include "intersection.hpp"
 #include "chain.hpp"
 #include "exception.hpp"
@@ -11,6 +12,7 @@ Stone::Stone(Intersection* iPtr, bool black) : chain_(0), iPtr_(iPtr), libs(8), 
 }
 
 Stone::~Stone() {
+	iPtr_->goban_->noteStoneRemoval(iPtr_);
 	iPtr_->stone_ = 0;
 	increaseNeighbourLiberties();
 }
@@ -58,17 +60,17 @@ bool Stone::isSameColour(Intersection* p) {
 }
 
 void Stone::increaseNeighbourLiberties() {
-	increaseLiberty(iPtr_->nbr_->up);
-	increaseLiberty(iPtr_->nbr_->down);
-	increaseLiberty(iPtr_->nbr_->left);
-	increaseLiberty(iPtr_->nbr_->right);
-	increaseLiberty(iPtr_->nbr_->farup);
-	increaseLiberty(iPtr_->nbr_->fardown);
-	increaseLiberty(iPtr_->nbr_->farleft);
-	increaseLiberty(iPtr_->nbr_->farright);
+	giveLiberty(iPtr_->nbr_->up);
+	giveLiberty(iPtr_->nbr_->down);
+	giveLiberty(iPtr_->nbr_->left);
+	giveLiberty(iPtr_->nbr_->right);
+	giveLiberty(iPtr_->nbr_->farup);
+	giveLiberty(iPtr_->nbr_->fardown);
+	giveLiberty(iPtr_->nbr_->farleft);
+	giveLiberty(iPtr_->nbr_->farright);
 }
 
-void Stone::increaseLiberty(Intersection* p) {
+void Stone::giveLiberty(Intersection* p) {
 	if (!p)
 		return;
 	if (!p->stone_)
@@ -77,8 +79,6 @@ void Stone::increaseLiberty(Intersection* p) {
 }
 
 void Stone::seeIfAnyoneIsDead() {
-	// Rather unusual demands for this function -- the object may get
-	// deleted during its execution.
 	std::vector<Chain*> enemyChains;
 	getChain(enemyChains, iPtr_->nbr_->up);
 	getChain(enemyChains, iPtr_->nbr_->down);
@@ -88,9 +88,9 @@ void Stone::seeIfAnyoneIsDead() {
 	getChain(enemyChains, iPtr_->nbr_->fardown);
 	getChain(enemyChains, iPtr_->nbr_->farleft);
 	getChain(enemyChains, iPtr_->nbr_->farright);
-	for (int i = 0; i < enemyChains.size(); ++i)
+	for (uint i = 0; i < enemyChains.size(); ++i)
 		enemyChains[i]->considerDying();
-	chain_->considerDying();
+	chain_->considerDying(true);
 }
 
 void Stone::getChain(std::vector<Chain*>& chvec, Intersection* p) {
@@ -100,7 +100,7 @@ void Stone::getChain(std::vector<Chain*>& chvec, Intersection* p) {
 		return;
 	if (p->stone_->black_ == black_)
 		return;
-	for (int i = 0; i < chvec.size(); ++i)
+	for (uint i = 0; i < chvec.size(); ++i)
 		if (p->stone_->chain_ == chvec[i])
 			return;
 	chvec.push_back(p->stone_->chain_);

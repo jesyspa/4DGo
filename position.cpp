@@ -44,3 +44,4 @@ uint const& Position::operator[](size_t i) const {
 	else
 		return arr_[i];
 }
+

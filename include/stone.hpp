@@ -20,7 +20,7 @@ class Stone {
 	void connectTo(Intersection* p);
 	bool isSameColour(Intersection* p);
 	void increaseNeighbourLiberties();
-	void increaseLiberty(Intersection* p);
+	void giveLiberty(Intersection* p);
 	void seeIfAnyoneIsDead();
 	void getChain(std::vector<Chain*>& chvec, Intersection* p);
 	Chain* chain_;

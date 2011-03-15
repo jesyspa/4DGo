@@ -53,6 +53,14 @@ struct Position {
 		pos[0]++;
 		return pos;
 	}
+	std::string toString() const {
+		std::string s("Lnln");
+		s[0] = arr_[0] + 'A';
+		s[1] = arr_[1] + '1';
+		s[2] = arr_[2] + 'a';
+		s[3] = arr_[3] + '1';
+		return s;
+	}
 
     private:
 	boost::array<uint,4> arr_;

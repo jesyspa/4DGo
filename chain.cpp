@@ -1,6 +1,7 @@
 #include <vector>
 #include "chain.hpp"
 #include "stone.hpp"
+#include "exception.hpp"
 
 typedef unsigned int uint;
 
@@ -40,7 +41,10 @@ void Chain::joinWith(Chain* ch) {
 	delete ch;
 }
 
-void Chain::considerDying() {
-	if (!checkLiberties())
+void Chain::considerDying(bool forbid) {
+	if (!checkLiberties()) {
+		if (forbid)
+			BOOST_THROW_EXCEPTION(ExcInvalidMove() << err_msg("This move is suicidal."));
 		delete this;
+	}
 }

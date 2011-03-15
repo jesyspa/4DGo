@@ -53,9 +53,10 @@ void IO::mainLoop() {
 	redraw();
 	std::string input;
 	if (!std::getline(std::cin, input))
-		throw ExcEOF();
+		BOOST_THROW_EXCEPTION(ExcEOF());
 	try {
 		if (regex_match(input, pass)) {
+			goban_->pass(blackTurn_);
 			blackTurn_ = !blackTurn_;
 		} else if (regex_match(input, move)) {
 			goban_->placeStone(blackTurn_, Position(input));

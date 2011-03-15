@@ -8,7 +8,11 @@
 typedef boost::error_info<struct tag_err_msg,std::string> err_msg;
 typedef boost::error_info<struct tag_type_err_msg,std::string> type_err_msg;
 
+
+//! \brief Base class for all exceptions that must terminate the program.
 struct ExcFatal : virtual boost::exception, virtual std::exception {};
+
+//! \brief Base class for all exceptions that must not terminate the program.
 struct ExcNonFatal : virtual boost::exception, virtual std::exception {};
 
 struct ExcSuccessExit : ExcFatal {

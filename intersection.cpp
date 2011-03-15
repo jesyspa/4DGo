@@ -3,7 +3,7 @@
 #include "neighbours.hpp"
 #include "stone.hpp"
 
-Intersection::Intersection() : stone_(0), nbr_(0) {
+Intersection::Intersection() : goban_(0), stone_(0), nbr_(0) {
 	
 }
 
