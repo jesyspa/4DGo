@@ -17,6 +17,7 @@ NetObject::Pointer NetObject::makeFromIncoming(tcp::socket& sock) {
 	NetObject::Pointer p;
 	switch (h.getType()) {
 		case Header::Null:
+		case Header::Error:
 		case Header::Greeting:
 			BOOST_THROW_EXCEPTION(ExcNotImplemented());
 		case Header::Message:
@@ -24,8 +25,7 @@ NetObject::Pointer NetObject::makeFromIncoming(tcp::socket& sock) {
 			p->read(sock);
 			return p;
 		case Header::Move:
-		case Header::Confirm:
-		case Header::Error:
+		case Header::History:
 		case Header::CloseConnection:
 			BOOST_THROW_EXCEPTION(ExcNotImplemented());
 	}

@@ -13,7 +13,7 @@
 namespace po = boost::program_options;
 using boost::asio::ip::tcp;
 
-Client::Client(int argc, char** argv) : sock_(io_), ip_("localhost"), port_("15493") {
+Client::Client(int argc, char** argv) : sock_(io_), ip_("localhost"), port_("15493"), colour_("Unknown") {
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "show help message")

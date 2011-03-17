@@ -23,15 +23,15 @@ class Header {
 	//! Allows to check that the clients are compatible. The comparison is
 	//! done with &~0xFF, so versions with only the lowest byte different
 	//! will still work together.
-	static const uint32_t version = 0; 
+	static const uint32_t version = 1; 
 	static const unsigned int hs = 32; // Header size
 	enum Type {
 		Null,
+		Error,
 		Greeting, // Server sends this to the player to inform him of his colour, etc.
 		Message,
 		Move,
-		Confirm,
-		Error,
+		History, // Popping, disabling, and enabling history.
 		CloseConnection
 	};
 
