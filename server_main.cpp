@@ -5,7 +5,11 @@
 int main(int argc, char** argv) {
 	try {
 		Server s(argc, argv);
-		s.run();
+		s.awaitConnections();
+		for (;;) {
+			s.sendMessage();
+			s.waitForMessage();
+		}
 	}
 	catch (ExcSuccessExit& e) {
 	}

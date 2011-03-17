@@ -38,9 +38,6 @@ std::string Move::toString() {
 			ss << (black ? "B" : "W");
 			ss << " PASS";
 			break;
-		case quit:
-			ss << "END";
-			break;
 		default:
 			ss << "Unknown move";
 	}

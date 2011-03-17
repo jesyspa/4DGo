@@ -4,6 +4,9 @@
 #include <boost/lexical_cast.hpp>
 #include "server.hpp"
 #include "connection.hpp"
+#include "netobject.hpp"
+#include "netmessage.hpp"
+#include "exception.hpp"
 
 namespace po = boost::program_options;
 using boost::asio::ip::tcp;
@@ -36,16 +39,25 @@ Server::~Server() {
 	delete acceptor_;
 }
 
-void Server::run() {
-	awaitConnections();
-}
-
 void Server::awaitConnections() {
 	acceptor_->accept(blackConnection_->socket());
-	blackConnection_->sendStr("Server: You have successfully conneced.\n");
-	std::cout << "Server: Black has successfully connected.\n";
-	acceptor_->accept(whiteConnection_->socket());
-	whiteConnection_->sendStr("Server: You have successfully conneced.\n");
-	std::cout << "Server: White has successfully connected.\n";
+	std::cout << "Client has connected.\n";
 }
 
+void Server::waitForMessage() {
+	NetObject::Pointer nop = NetObject::makeFromIncoming(blackConnection_->socket());
+	NetMessage::Pointer nmp;
+	if (nop->getType() == Header::Message)
+		nmp = boost::dynamic_pointer_cast<NetMessage>(nop);
+	else
+		BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
+	std::cout << nmp->getString() << "\n";
+}
+
+void Server::sendMessage() {
+	std::string str;
+	std::getline(std::cin, str);
+	NetMessage nm(str);
+	nm.write(blackConnection_->socket());
+	std::cout << "Message sent.\n";
+}

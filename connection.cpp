@@ -20,13 +20,3 @@ tcp::socket& Connection::socket() {
 	return socket_;
 }
 
-void Connection::sendStr(std::string const& str) {
-	boost::system::error_code error;
-	boost::asio::write(socket_, boost::asio::buffer(str),
-	    boost::asio::transfer_all(), error);
-	if (error == boost::asio::error::eof) {
-		throw ExcSuccessExit();
-	} else if (error) {
-		throw boost::system::system_error(error); // Some other error.
-	}
-}

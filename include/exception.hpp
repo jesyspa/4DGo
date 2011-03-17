@@ -23,7 +23,11 @@ struct ExcSuccessExit : ExcFatal {
 
 struct ExcInvalidMove : ExcNonFatal {};
 struct ExcInvalidPos : ExcNonFatal {};
+struct ExcInvalidValue : ExcNonFatal {};
 struct ExcNothingToUndo : ExcNonFatal {};
+struct ExcReadLengthMismatch : ExcNonFatal {};
+struct ExcWriteLengthMismatch : ExcNonFatal {};
+struct ExcIncorrectNetObjectType : ExcNonFatal {};
 
 struct ExcNotImplemented : ExcFatal {
 	ExcNotImplemented() {
@@ -34,6 +38,12 @@ struct ExcNotImplemented : ExcFatal {
 struct ExcEOF : ExcFatal {
 	ExcEOF() {
 		*this << type_err_msg("End of file reached.");
+	}
+};
+
+struct ExcDisconnected : ExcFatal {
+	ExcDisconnected() {
+		*this << type_err_msg("Connection closed safely but unexpectedly.");
 	}
 };
 

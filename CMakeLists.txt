@@ -13,11 +13,12 @@ SET( MAIN_SOURCE_FILES
 
 SET( SERVER_SOURCE_FILES 
 	server_main.cpp server.cpp connection.cpp netmove.cpp position.cpp
-	move.cpp
+	move.cpp header.cpp netobject.cpp netmessage.cpp
 	)
 
 SET( CLIENT_SOURCE_FILES
 	client_main.cpp client.cpp netmove.cpp position.cpp move.cpp
+	header.cpp netobject.cpp netmessage.cpp
 	)
 
 ADD_EXECUTABLE( 4dgo ${MAIN_SOURCE_FILES} )

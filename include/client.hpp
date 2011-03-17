@@ -21,12 +21,11 @@ class Client {
 	Client(int argc, char** argv); 
 	~Client();
 	void connect();
-	NetMove listenForMove();
-	bool amBlack();
-	int submitMove(Move const&);
+	void waitForMessage();
+	void sendMessage();
     private:
 	boost::asio::io_service io_;
-	boost::asio::ip::tcp::socket socket_;
+	boost::asio::ip::tcp::socket sock_;
 	std::string ip_;
 	std::string port_;
 };

@@ -18,7 +18,6 @@ class Connection : public boost::enable_shared_from_this<Connection> {
 	~Connection();
 	static Pointer create(boost::asio::io_service& io);
 	boost::asio::ip::tcp::socket& socket();
-	void sendStr(std::string const& str);
 
     private:
 	void checkForErrors(const boost::system::error_code& error);

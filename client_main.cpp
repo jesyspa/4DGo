@@ -6,6 +6,10 @@ int main(int argc, char** argv) {
 	try {
 		Client c(argc, argv);
 		c.connect();
+		for (;;) {
+			c.waitForMessage();
+			c.sendMessage();
+		}
 	}
 	catch (ExcSuccessExit& e) {
 	}

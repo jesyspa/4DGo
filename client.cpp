@@ -7,11 +7,13 @@
 #include "client.hpp"
 #include "move.hpp"
 #include "netmove.hpp"
+#include "netobject.hpp"
+#include "netmessage.hpp"
 
 namespace po = boost::program_options;
 using boost::asio::ip::tcp;
 
-Client::Client(int argc, char** argv) : socket_(io_), ip_("localhost"), port_("15493") {
+Client::Client(int argc, char** argv) : sock_(io_), ip_("localhost"), port_("15493") {
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "show help message")
@@ -49,41 +51,28 @@ void Client::connect() {
 	boost::system::error_code error = boost::asio::error::host_not_found;
 	while (error && endpoint_iterator != end)
 	{
-		socket_.close();
-		socket_.connect(*endpoint_iterator++, error);
+		sock_.close();
+		sock_.connect(*endpoint_iterator++, error);
 	}
 	if (error) // Make sure the connection is okay.
 		throw boost::system::system_error(error);
-
-	// Read the MOTD.
-	std::vector<char> buf;
-	size_t len = socket_.read_some(boost::asio::buffer(buf), error);
-	if (error) // The server should never close the connection at this point.
-		throw boost::system::system_error(error);
-	std::cout.write(buf.data(), len);
+	std::cout << "Connection successful.\n";
 }
 
-bool Client::amBlack() {
-	boost::system::error_code error;
-	boost::array<int, 1> buf;
-	socket_.read_some(boost::asio::buffer(buf), error);
-	return buf[0];
+void Client::waitForMessage() {
+	NetObject::Pointer nop = NetObject::makeFromIncoming(sock_);
+	NetMessage::Pointer nmp;
+	if (nop->getType() == Header::Message)
+		nmp = boost::dynamic_pointer_cast<NetMessage>(nop);
+	else
+		BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
+	std::cout << nmp->getString() << "\n";
 }
 
-NetMove Client::listenForMove() {
-	boost::system::error_code error;
-	NetMove nm;
-	socket_.read_some(boost::asio::buffer(nm.buf), error);
-	if (error) {
-		throw boost::system::system_error(error); // Some other error.
-	}
-	return nm;
-}
-
-int Client::submitMove(Move const& mv) {
-	boost::system::error_code error;
-	NetMove nm(mv);
-	boost::asio::write(socket_, boost::asio::buffer(nm.buf),
-	    boost::asio::transfer_all(), error);
-	return 0;
+void Client::sendMessage() {
+	std::string str;
+	std::getline(std::cin, str);
+	NetMessage nm(str);
+	nm.write(sock_);
+	std::cout << "Message sent.\n";
 }

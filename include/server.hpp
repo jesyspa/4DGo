@@ -15,11 +15,10 @@ class Server {
     public:
 	Server(int argc, char** argv); 
 	~Server();
-	void run();
 	void awaitConnections();
+	void waitForMessage();
+	void sendMessage();
     private:
-	void blackPlayerConnected();
-	void whitePlayerConnected();
 	boost::asio::io_service io_;
 	boost::asio::ip::tcp::acceptor* acceptor_;
 	Connection::Pointer blackConnection_;

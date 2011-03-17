@@ -14,8 +14,7 @@ class Move {
 		none,
 		pass,
 		play,
-		remove,
-		quit
+		remove
 	} type;
 	Move(); 
 	Move(Move const&); 
