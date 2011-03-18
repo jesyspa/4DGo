@@ -1,7 +1,9 @@
 #include <string>
 #include <boost/regex.hpp>
-#include "position.hpp"
-#include "exception.hpp"
+#include <position.hpp>
+#include <exceptions.hpp>
+
+namespace fdgo {
 
 const boost::regex Position::validPos_("^[A-D][1-4][a-d][1-4]$");
 
@@ -45,3 +47,4 @@ uint const& Position::operator[](size_t i) const {
 		return arr_[i];
 }
 
+}

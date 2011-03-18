@@ -6,21 +6,27 @@ ADD_DEFINITIONS( " -ggdb -Wall -Wextra -pedantic -std=c++0x -Winline
 -Wwrite-strings -O0" )
 LINK_LIBRARIES( boost_program_options boost_regex boost_date_time
 	boost_system boost_thread )
-SET( MAIN_SOURCE_FILES
-	main.cpp io.cpp goban.cpp intersection.cpp stone.cpp chain.cpp
-	position.cpp memory.cpp move.cpp
+
+SET( NETWORK_SOURCE_FILES
+	net/header net/object net/null net/greeting net/error "net/message"
+	net/move net/undo net/close 
+	)
+
+SET( SHARED_SOURCE_FILES
+	${NETWORK_SOURCE_FILES}
+	position move history 
 	)
 
 SET( SERVER_SOURCE_FILES 
-	server_main.cpp server.cpp connection.cpp netmove.cpp position.cpp
-	move.cpp header.cpp netobject.cpp netmessage.cpp
+	server/main server/server server/connection server/goban
+	server/intersection server/stone server/chain
+	${SHARED_SOURCE_FILES}
 	)
 
 SET( CLIENT_SOURCE_FILES
-	client_main.cpp client.cpp netmove.cpp position.cpp move.cpp
-	header.cpp netobject.cpp netmessage.cpp
+	client/main client/client client/fakegoban client/chatbox
+	${SHARED_SOURCE_FILES}
 	)
 
-ADD_EXECUTABLE( 4dgo ${MAIN_SOURCE_FILES} )
 ADD_EXECUTABLE( 4dgos ${SERVER_SOURCE_FILES} )
 ADD_EXECUTABLE( 4dgoc ${CLIENT_SOURCE_FILES} )

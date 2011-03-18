@@ -3,11 +3,11 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <boost/program_options.hpp>
-#include "io.hpp"
-#include "goban.hpp"
-#include "memory.hpp"
-#include "score.hpp"
-#include "exception.hpp"
+#include <io.hpp>
+#include <goban.hpp>
+#include <memory.hpp>
+#include <score.hpp>
+#include <exception.hpp>
 
 namespace po = boost::program_options;
 

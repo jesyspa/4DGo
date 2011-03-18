@@ -1,11 +1,12 @@
 #ifndef FDGO_INCLUDE_POSITION_HPP
 #define FDGO_INCLUDE_POSITION_HPP
 
+#include <cstdint>
 #include <string>
 #include <boost/regex.hpp>
 #include <boost/array.hpp>
 
-typedef unsigned int uint;
+namespace fdgo {
 
 //! \brief Contains coordinates on the goban.
 //!
@@ -15,8 +16,8 @@ struct Position {
 	Position();
 	Position(std::string const& str);
 	Position(int a, int b, int c, int d);
-	uint& operator[](size_t i);
-	uint const& operator[](size_t i) const;
+	uint32_t& operator[](size_t i);
+	uint32_t const& operator[](size_t i) const;
 	Position up() const {
 		Position pos = *this;
 		pos[3]++;
@@ -67,8 +68,10 @@ struct Position {
 	}
 
     private:
-	boost::array<uint,4> arr_;
+	boost::array<uint32_t,4> arr_;
 	static const boost::regex validPos_;
 };
+
+}
 
 #endif // Guard

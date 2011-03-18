@@ -1,22 +1,13 @@
 #include <sstream>
-#include "move.hpp"
-#include "netmove.hpp"
-#include "exception.hpp"
+#include <move.hpp>
+#include <exceptions.hpp>
+
+namespace fdgo {
 
 Move::Move() : type(pass), black(false), pos(0, 0, 0, 0) {
 }
 
 Move::Move(Move const& mov) : type(mov.type), black(mov.black), pos(mov.pos) {
-}
-
-Move::Move(NetMove const& nm ) {
-	type = static_cast<Move::MType> (nm.buf[0]);
-	for (int i = 0; i < 4; ++i)
-		pos[i] = nm.buf[i+1];
-	if (nm.buf[5])
-		black = true;
-	else
-		black = false;
 }
 
 Move::Move(bool blck, Position const& ps, MType movetype) : type(movetype), black(blck), pos(ps) {
@@ -42,4 +33,6 @@ std::string Move::toString() {
 			ss << "Unknown move";
 	}
 	return ss.str();
+}
+
 }
