@@ -10,7 +10,7 @@
 namespace fdgo {
 namespace server {
 
-Goban::Goban(History& mem) : blackPrisoners_(0), whitePrisoners_(0), mem_(mem) {
+Goban::Goban(History& mem) : blackPrisoners_(0), whitePrisoners_(0), hist_(mem) {
 	for (unsigned int i = 0; i < boardarea_; ++i)
 		intrArr_[i].goban_ = this;
 }
@@ -23,7 +23,7 @@ void Goban::placeStone(bool black, Position const& pos) {
 	if(wrkIntr->needNeighbours())
 		wrkIntr->giveNeighbours(makeNeighbours(pos));
 	wrkIntr->placeStone(black);
-	mem_.placeStone(black, pos);
+	hist_.placeStone(black, pos);
 }
 
 void Goban::killGroup(Position const& pos) {
@@ -40,20 +40,8 @@ void Goban::removeStone(Position const& pos) {
 		BOOST_THROW_EXCEPTION(ExcNoStonePresent());
 }
 
-void Goban::undo() {
-	HistLock mlock(mem_);
-	Move lastmove = mem_.popLastMove();
-	if (lastmove.type != Move::play)
-		throw ExcNothingToUndo();
-	removeStone(lastmove.pos);
-	while (mem_.lastMoveType() == Move::remove) {
-		lastmove = mem_.popLastMove();
-		placeStone(!lastmove.black, lastmove.pos);
-	}
-}
-
 void Goban::noteStoneRemoval(Intersection* itr, bool black) {
-	mem_.removeStone(getPosition(itr));
+	hist_.removeStone(getPosition(itr));
 	if (black)
 		blackPrisoners_++;
 	else

@@ -40,6 +40,7 @@ class Client {
 	void disconnect();
 
 	void listen();
+	void takeInput();
 	template<net::Header::Type T>
 	net::Object::Pointer expect();
 

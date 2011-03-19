@@ -8,7 +8,8 @@ namespace net {
 
 Error::Error() {
 	header_.setType(Header::Error);
-	header_.setLength(0);
+	header_.setLength(2);
+	msg_.resize(2);
 }
 
 Error::Error(Header const& header) : Object(header) {
@@ -63,11 +64,11 @@ void Error::setString(std::string str) {
 void Error::throwSelf() {
 	switch (getError()) {
 		case unexpectedType:
-			BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
+			BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType() << err_msg(getString()));
 		case invalidMove:
-			BOOST_THROW_EXCEPTION(ExcInvalidMove());
+			BOOST_THROW_EXCEPTION(ExcInvalidMove() << err_msg(getString()));
 		default:
-			BOOST_THROW_EXCEPTION(ExcUnknownError());
+			BOOST_THROW_EXCEPTION(ExcUnknownError() << err_msg(getString()));
 	}
 }
 

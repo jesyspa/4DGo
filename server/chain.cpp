@@ -11,7 +11,6 @@ namespace server {
 
 Chain::Chain(Stone* st) : black_(st->black_) {
 	stonevec_.push_back(st);
-	st->chain_.reset(this);
 }
 
 void Chain::addStone(Stone* st) {

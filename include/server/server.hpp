@@ -4,11 +4,14 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <server/connection.hpp>
+#include <server/goban.hpp>
+#include <history.hpp>
 
 namespace fdgo {
-namespace server {
 
 class Move;
+
+namespace server {
 
 class Server {
     private:
@@ -20,14 +23,17 @@ class Server {
 	~Server();
 	void awaitConnections();
 	void run();
-	void waitForMessage();
-	void sendMessage();
     private:
-	void listen(bool black);
+	void listen();
 
 	void sendMessage(bool black, std::string const& str);
 	void broadcast(std::string const& str);
 	void broadcast(Move const& mv);
+	void broadcastMoves();
+
+	void tryPlay(Move const& mv);
+
+	void undo();
 
 	void disableHistory();
 	void enableHistory();
@@ -38,6 +44,11 @@ class Server {
 	Connection::Pointer bCon_;
 	Connection::Pointer wCon_;
     	unsigned int port_;
+
+	History hist_;
+	Goban goban_;
+
+	bool black_;
 };
 
 }

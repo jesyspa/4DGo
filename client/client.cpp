@@ -67,43 +67,18 @@ void Client::connect() {
 	}
 	if (error) // Make sure the connection is okay.
 		throw boost::system::system_error(error);
-	std::cout << "Connection successful.\n";
+	net::Object::Pointer nobp = expect<net::Header::Greeting>();
+	net::Greeting::Pointer ngrp;
+	ngrp = boost::dynamic_pointer_cast<net::Greeting>(nobp);
+	black_ = ngrp->getBlack();
+	std::cout << "Connection successful, you are " << (black_ ? "black" : "white") << ".\n";
 }
 
 void Client::run() {
+	draw();
 	for (;;) {
-		try {
-			listen();
-			draw();
-			std::string input;
-			if (!std::getline(std::cin, input))
-				BOOST_THROW_EXCEPTION(ExcEOF());
-			if (regex_match(input, rgxPass)) {
-				sendPass();
-				cbox_.addMessage("You have passed.");
-			} else if (regex_match(input, rgxMove)) {
-				sendPlay(Position(input));
-			} else if (regex_match(input, rgxUndo)) {
-				sendUndo();
-				cbox_.addMessage("Last move undone.");
-			} else if (regex_match(input, rgxSave)) {
-				hist_.writeToDisk("log.txt");
-				cbox_.addMessage("Game saved.");
-			} else if (regex_match(input, rgxExit)) {
-				disconnect();
-				BOOST_THROW_EXCEPTION(ExcSuccessExit());
-			} else {
-				cbox_.addMessage("Unknown instruction: " + input);
-			}
-		}
-		catch (ExcNonFatal& e) {
-			if (std::string const* msg = boost::get_error_info<err_msg>(e))
-				cbox_.addMessage(std::string("Error: " + *msg));
-			#ifndef NDEBUG
-				std::cerr << "\nDiagnostics info:\n";
-				std::cerr << boost::diagnostic_information(e);
-			#endif
-		}
+		listen();
+		takeInput();
 	}
 }
 
@@ -125,6 +100,7 @@ void Client::listen() {
 			net::Move::Pointer nmvp;
 			nmvp = boost::dynamic_pointer_cast<net::Move>(nobp);
 			play(nmvp->getMove());
+			draw();
 		} else if(nobp->getType() == net::Header::History) {
 			BOOST_THROW_EXCEPTION(ExcNotImplemented());
 		} else if(nobp->getType() == net::Header::CloseConnection) {
@@ -137,6 +113,44 @@ void Client::listen() {
 	}
 }
 
+void Client::takeInput() {
+	for (;;) {
+		try {
+			std::cout << "Server is listening.\n";
+			std::string input;
+			if (!std::getline(std::cin, input))
+				BOOST_THROW_EXCEPTION(ExcEOF());
+			if (regex_match(input, rgxPass)) {
+				sendPass();
+				cbox_.addMessage("You have passed.");
+				return;
+			} else if (regex_match(input, rgxMove)) {
+				sendPlay(Position(input));
+				return;
+			} else if (regex_match(input, rgxUndo)) {
+				sendUndo();
+				cbox_.addMessage("Last move undone.");
+			} else if (regex_match(input, rgxSave)) {
+				hist_.writeToDisk("log.txt");
+				cbox_.addMessage("Game saved.");
+			} else if (regex_match(input, rgxExit)) {
+				disconnect();
+				BOOST_THROW_EXCEPTION(ExcSuccessExit());
+			} else {
+				cbox_.addMessage("Unknown instruction: " + input);
+			}
+		}
+		catch (ExcNonFatal& e) {
+			if (std::string const* msg = boost::get_error_info<err_msg>(e))
+				cbox_.addMessage(std::string("Error: " + *msg));
+			#ifndef NDEBUG
+				std::cerr << "\nDiagnostics info:\n";
+				std::cerr << boost::diagnostic_information(e);
+			#endif
+			draw();
+		}
+	}
+}
 
 void Client::sendMessage(std::string const& str) {
 	cbox_.addMessage(str);

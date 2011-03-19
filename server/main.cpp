@@ -8,8 +8,7 @@ int main(int argc, char** argv) {
 	try {
 		server::Server s(argc, argv);
 		s.awaitConnections();
-		s.sendMessage();
-		s.waitForMessage();
+		s.run();
 	}
 	catch (ExcSuccessExit& e) {
 	}

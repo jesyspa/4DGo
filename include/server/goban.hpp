@@ -26,7 +26,6 @@ class Goban {
 	void placeStone(bool black, Position const& pos);
 	void removeStone(Position const& pos);
 	void killGroup(Position const& pos);
-	void undo();
 	void noteStoneRemoval(Intersection* itr, bool black);
 	Score makeScore();
 
@@ -40,7 +39,7 @@ class Goban {
 
 	unsigned int blackPrisoners_;
 	unsigned int whitePrisoners_;
-	History& mem_;
+	History& hist_;
 };
 
 }

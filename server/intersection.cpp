@@ -6,7 +6,7 @@
 namespace fdgo {
 namespace server {
 
-Intersection::Intersection() : goban_(0) {
+Intersection::Intersection() : goban_(0), stone_(0) {
 	
 }
 

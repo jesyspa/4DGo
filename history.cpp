@@ -18,7 +18,7 @@ void History::placeStone(bool black, Position const& pos) {
 		return;
 	}
 	Move m(black, pos, Move::play);
-	mvec_.push_back(m);
+	mstack_.push(m);
 }
 
 void History::removeStone(Position const& pos) {
@@ -26,7 +26,7 @@ void History::removeStone(Position const& pos) {
 		return;
 	}
 	Move m(false, pos, Move::remove);
-	mvec_.push_back(m);
+	mstack_.push(m);
 }
 
 void History::pass(bool black) {
@@ -34,7 +34,7 @@ void History::pass(bool black) {
 		return;
 	}
 	Move m(black, Position(), Move::pass);
-	mvec_.push_back(m);
+	mstack_.push(m);
 }
 
 void History::writeToDisk(std::string filename) {
@@ -56,6 +56,19 @@ Move History::popLastMove() {
 	Move m = mvec_.back();
 	mvec_.pop_back();
 	return m;
+}
+
+Move History::peekStack() {
+	return mstack_.top();
+}
+
+bool History::unhandledMoves() {
+	return !mstack_.empty();
+}
+
+void History::confirmTop() {
+	mvec_.push_back(mstack_.top());
+	mstack_.pop();
 }
 
 }

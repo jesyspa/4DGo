@@ -13,6 +13,13 @@ Greeting::Greeting() {
 		msg_[a] = 0;
 }
 
+Greeting::Greeting(float komi, bool black) {
+	header_.setType(Header::Greeting);
+	header_.setLength(size_);
+	setKomi(komi);
+	setBlack(black);
+}
+
 Greeting::Greeting(Header const& header) : Object(header) {
 	if (header_.getType() != Header::Greeting)
 		BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
@@ -41,7 +48,7 @@ float Greeting::getKomi() {
 }
 
 void Greeting::setBlack(bool black) {
-	msgAs<uint8_t>(0) = black;
+	msgAs<uint8_t>(0) = black ? 1 : 0;
 }
 
 bool Greeting::getBlack() {
