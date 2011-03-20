@@ -30,16 +30,16 @@ INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 SET( CLIENT_SOURCES
-	client/main client/client client/fakegoban client/chatbox
-	client/gui/mainwidget client/gui/mainwidget_init client/gui/chatbox
-	client/gui/goban client/gui/gobanslice client/gui/info
+	client/main client/client client/gui/mainwidget
+	client/gui/mainwidget_init client/gui/chatbox client/gui/goban
+	client/gui/gobanslice client/gui/info
 	${SHARED_SOURCES}
 	)
 
 SET( CLIENT_HEADERS
-	include/client/gui/mainwidget.hpp include/client/gui/chatbox.hpp
-	include/client/gui/goban.hpp include/client/gui/gobanslice.hpp
-	include/client/gui/info.hpp
+	include/client/client.hpp include/client/gui/mainwidget.hpp
+	include/client/gui/chatbox.hpp include/client/gui/goban.hpp
+	include/client/gui/gobanslice.hpp include/client/gui/info.hpp
 	)
 
 QT4_WRAP_CPP(CLIENT_HEADERS_MOC ${CLIENT_HEADERS})

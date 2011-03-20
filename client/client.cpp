@@ -1,59 +1,27 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <boost/program_options.hpp>
+#include <QtCore>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <client/client.hpp>
-#include <client/chatbox.hpp>
-#include <client/fakegoban.hpp>
 #include <net/all.hpp>
 #include <move.hpp>
 #include <exceptions.hpp>
 
-namespace po = boost::program_options;
 using boost::asio::ip::tcp;
 
 namespace fdgo {
 namespace client {
 
-const boost::regex Client::rgxPass("^pass$");
-const boost::regex Client::rgxMove("^[A-D][1-4][a-d][1-4]$");
-const boost::regex Client::rgxKill("^kill [A-D][1-4][a-d][1-4]$"); // Not used
-const boost::regex Client::rgxUndo("^undo$");
-const boost::regex Client::rgxSave("^save$");
-const boost::regex Client::rgxGetScore("^score$"); // Not used
-const boost::regex Client::rgxExit("^exit$");
-
-Client::Client(int argc, char** argv) : hist_(false), hlock_(0), sock_(io_), ip_("localhost"), port_("15493"), colour_("Unknown") {
-	po::options_description desc("Allowed options");
-	desc.add_options()
-		("help", "show help message")
-		("ip", po::value<std::string>(), "host to connect to")
-		("port", po::value<std::string>(), "port to connect on")
-	;
-
-	po::variables_map vm;
-	po::store(po::parse_command_line(argc, argv, desc), vm);
-	po::notify(vm);
-
-	if (vm.count("help")) {
-		std::cout << desc << "\n";
-		throw;
-	}
-	if (vm.count("ip")) {
-		ip_ = vm["ip"].as<std::string>();
-	}
-	if (vm.count("port")) {
-		port_ = vm["port"].as<std::string>();
-	}
+Client::Client(QObject* parent) : QObject(parent), hist_(false), hlock_(0), sock_(io_), ip_("localhost"), port_("15493") {
 }
 
 Client::~Client() {
 	delete hlock_;
 }
 
-void Client::connect() {
+void Client::cl_connect() {
 	// Get the connection up.
 	tcp::resolver resolver (io_);
 	tcp::resolver::query query(ip_, port_);
@@ -72,15 +40,23 @@ void Client::connect() {
 	net::Greeting::Pointer ngrp;
 	ngrp = boost::dynamic_pointer_cast<net::Greeting>(nobp);
 	black_ = ngrp->getBlack();
-	std::cout << "Connection successful, you are " << (black_ ? "black" : "white") << ".\n";
+	emit display(QString("Connection successful, you are %1.\n").arg(black_ ? "black" : "white"));
 }
 
-void Client::run() {
-	draw();
-	for (;;) {
-		listen();
-		takeInput();
-	}
+void Client::playStone(Position const& pos) {
+	sendPlay(pos);
+}
+
+void Client::message(QString const& str) {
+	sendMessage(str.toStdString());
+}
+
+void Client::undo() {
+	sendUndo();
+}
+
+void Client::pass() {
+	sendPass();
 }
 
 void Client::listen() {
@@ -97,12 +73,11 @@ void Client::listen() {
 			} else if(nobp->getType() == net::Header::Message) {
 				net::Message::Pointer nmsgp;
 				nmsgp = boost::dynamic_pointer_cast<net::Message>(nobp);
-				cbox_.addMessage(nmsgp->getString());
+				emit display(nmsgp->getString().c_str());
 			} else if(nobp->getType() == net::Header::Move) {
 				net::Move::Pointer nmvp;
 				nmvp = boost::dynamic_pointer_cast<net::Move>(nobp);
 				play(nmvp->getMove());
-				draw();
 			} else if(nobp->getType() == net::Header::History) {
 				net::History::Pointer nhip;
 				nhip = boost::dynamic_pointer_cast<net::History>(nobp);
@@ -117,59 +92,17 @@ void Client::listen() {
 		}
 		catch (ExcNonFatal& e) {
 			if (std::string const* msg = boost::get_error_info<err_msg>(e))
-				cbox_.addMessage(std::string("Error: " + *msg));
+				emit display(msg->c_str());
 			#ifndef NDEBUG
 				std::cerr << "\nDiagnostics info:\n";
 				std::cerr << boost::diagnostic_information(e);
 			#endif
-			draw();
-		}
-	}
-}
-
-void Client::takeInput() {
-	for (;;) {
-		try {
-			std::cout << "Server is listening.\n";
-			std::string input;
-			if (!std::getline(std::cin, input))
-				BOOST_THROW_EXCEPTION(ExcEOF());
-			if (regex_match(input, rgxPass)) {
-				sendPass();
-				cbox_.addMessage("You have passed.");
-				return;
-			} else if (regex_match(input, rgxMove)) {
-				sendPlay(Position(input));
-				return;
-			} else if (regex_match(input, rgxUndo)) {
-				sendUndo();
-				cbox_.addMessage("Last move undone.");
-				draw();
-				return;
-			} else if (regex_match(input, rgxSave)) {
-				hist_.writeToDisk("log.txt");
-				cbox_.addMessage("Game saved.");
-			} else if (regex_match(input, rgxExit)) {
-				disconnect();
-				BOOST_THROW_EXCEPTION(ExcSuccessExit());
-			} else {
-				cbox_.addMessage("Unknown instruction: " + input);
-			}
-		}
-		catch (ExcNonFatal& e) {
-			if (std::string const* msg = boost::get_error_info<err_msg>(e))
-				cbox_.addMessage(std::string("Error: " + *msg));
-			#ifndef NDEBUG
-				std::cerr << "\nDiagnostics info:\n";
-				std::cerr << boost::diagnostic_information(e);
-			#endif
-			draw();
 		}
 	}
 }
 
 void Client::sendMessage(std::string const& str) {
-	cbox_.addMessage(str);
+	emit display(str.c_str());
 	net::Message nmsg(str);
 	nmsg.write(sock_);
 }
@@ -179,17 +112,20 @@ void Client::sendPlay(Position const& pos) {
 	net::Move nmv(mv);
 	nmv.write(sock_);
 	expect<net::Header::Null>();
+	listen();
 }
 
 void Client::sendPass() {
 	Move mv(black_, Position(0,0,0,0), Move::pass);
 	net::Move nmv(mv);
 	nmv.write(sock_);
+	listen();
 }
 
 void Client::sendUndo() {
 	net::Undo nun;
 	nun.write(sock_);
+	listen();
 }
 
 void Client::disconnect() {
@@ -209,7 +145,7 @@ net::Object::Pointer Client::expect() {
 			nerrp = boost::dynamic_pointer_cast<net::Error>(nobp);
 			nerrp->throwSelf();
 		} else {
-			net::Error nerr(net::Error::unexpectedType, "When waiting for move confirmation.");
+			net::Error nerr(net::Error::unexpectedType, "");
 			nerr.write(sock_);
 		}
 	}
@@ -223,10 +159,10 @@ void Client::play(Move const& mv) {
 		case Move::pass:
 			break;
 		case Move::play:
-			goban_.placeStone(mv.black, mv.pos);
+			emit placeStone(mv.black, mv.pos);
 			break;
 		case Move::remove:
-			goban_.removeStone(mv.pos);
+			emit removeStone(mv.pos);
 			break;
 		default:
 			BOOST_THROW_EXCEPTION(ExcInvalidMove());
@@ -250,11 +186,6 @@ void Client::touchHistory(net::History::Pointer nhip) {
 			hist_.popLastMove(); // Get rid of the placement.
 			break;
 	}
-}
-
-void Client::draw() {
-	goban_.draw();
-	cbox_.draw();
 }
 
 }

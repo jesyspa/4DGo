@@ -1,6 +1,7 @@
 #ifndef FDGO_INCLUDE_CLIENT_CLIENT_HPP
 #define FDGO_INCLUDE_CLIENT_CLIENT_HPP
 
+#include <QObject>
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
@@ -24,34 +25,39 @@ namespace client {
 //! This is an abstraction for the client side of the server-client
 //! connection.
 
-class Client {
-    private:
-	// Should never be called.
-	Client(Client const&); 
-	Client& operator=(Client const&);
+class Client : public QObject {
+	Q_OBJECT
     public:
-	Client(int argc, char** argv); 
+	Client(QObject* parent = 0); 
 	~Client();
-	void connect();
-	void run();
+
+    public slots:
+	void cl_connect();
+	void playStone(Position const& pos);
+	void message(QString const& str);
+	void undo();
+	void pass();
+	void disconnect();
+
+    signals:
+	void display(QString const& str);
+	void placeStone(bool black, Position const& pos);
+	void removeStone(Position const& pos);
+
     private:
 	void sendMessage(std::string const& str);
 	void sendPlay(Position const& pos);
 	void sendPass();
 	void sendUndo();
-	void disconnect();
 
 	void listen();
-	void takeInput();
+
 	template<net::Header::Type T>
 	net::Object::Pointer expect();
 
 	void play(Move const& mv);
 	void touchHistory(net::History::Pointer nhip);
-	void draw();
 
-	FakeGoban goban_;
-	Chatbox cbox_;
 	History hist_;
 	HistLock* hlock_;
 
@@ -60,15 +66,6 @@ class Client {
 	std::string ip_;
 	std::string port_;
 	bool black_;
-	std::string colour_;
-
-	static const boost::regex rgxPass;
-	static const boost::regex rgxMove;
-	static const boost::regex rgxKill;
-	static const boost::regex rgxUndo;
-	static const boost::regex rgxSave;
-	static const boost::regex rgxGetScore;
-	static const boost::regex rgxExit;
 };
 
 }

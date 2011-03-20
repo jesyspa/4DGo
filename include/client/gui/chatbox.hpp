@@ -21,18 +21,21 @@ class Chatbox : public QWidget {
 
     public slots:
 	void inputValid(QString const& text);
-	void addMessage(QString const& str);
+	void display(QString const& str);
 
     private slots:
 	void submitInput();
 
     signals:
 	void setSubmit(bool);
+
+	void message(QString const& str);
 	void playStone(Position const& pos);
 	void undo();
 	void pass();
+	void cl_connect();
+	void disconnect();
 	void exit();
-	void message(QString const& str);
 
     private:
 	void parseString(QString str);

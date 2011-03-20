@@ -8,11 +8,11 @@ using namespace fdgo;
 using namespace fdgo::client;
 
 int main(int argc, char** argv) {
-#if 0
 	try {
-		client::Client c(argc, argv);
-		c.connect();
-		c.run();
+		QApplication qapp(argc, argv);
+		gui::MainWidget mw;
+		mw.show();
+		return qapp.exec();
 	}
 	catch (ExcSuccessExit& e) {
 	}
@@ -34,9 +34,4 @@ int main(int argc, char** argv) {
 			std::cerr << boost::diagnostic_information(e);
 		#endif
 	}
-#endif
-	QApplication qapp(argc, argv);
-	gui::MainWidget mw;
-	mw.show();
-	return qapp.exec();
 }

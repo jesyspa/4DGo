@@ -16,6 +16,9 @@ class QVBoxLayout;
 
 namespace fdgo {
 namespace client {
+
+class Client;
+
 namespace gui {
 
 class Chatbox;
@@ -41,6 +44,7 @@ class MainWidget : public QWidget {
 	QPushButton* btnExit_;
 	QSpacerItem* vspcInfo_;
 	Chatbox* cbox_;
+	Client* client_;
 };
 
 }

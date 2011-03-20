@@ -3,6 +3,7 @@
 #include <client/gui/chatbox.hpp>
 #include <client/gui/goban.hpp>
 #include <client/gui/info.hpp>
+#include <client/client.hpp>
 
 namespace fdgo {
 namespace client {
@@ -71,6 +72,30 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent) {
 	QWidget::setTabOrder( btnPass_, btnUndo_ );
 	QWidget::setTabOrder( btnUndo_, btnExit_ );
 	QWidget::setTabOrder( btnExit_, cbox_ );
+
+	client_ = new Client(this);
+
+	connect(       cbox_, SIGNAL(message(QString const&)),
+	             client_, SLOT(  message(QString const&))
+	       );
+	connect(       cbox_, SIGNAL(playStone(Position const&)),
+	             client_, SLOT(  playStone(Position const&))
+	       );
+	connect(       cbox_, SIGNAL(undo()),
+	             client_, SLOT(  undo())
+	       );
+	connect(       cbox_, SIGNAL(pass()),
+	             client_, SLOT(  pass())
+	       );
+	connect(       cbox_, SIGNAL(cl_connect()),
+	             client_, SLOT(  cl_connect())
+	       );
+	connect(       cbox_, SIGNAL(disconnect()),
+	             client_, SLOT(  disconnect())
+	       );
+	connect(     client_, SIGNAL(display(QString const&)),
+	               cbox_, SLOT(  display(QString const&))
+	       );
 }
 
 }

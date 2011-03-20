@@ -53,7 +53,7 @@ void Chatbox::inputValid(QString const& text) {
 	emit setSubmit(!text.isEmpty());
 }
 
-void Chatbox::addMessage(QString const& str) {
+void Chatbox::display(QString const& str) {
 	tbCBox_->insertPlainText(str);
 }
 
@@ -81,6 +81,8 @@ void Chatbox::parseString(QString str) {
 		emit undo();
 	} else if (*it == "exit") {
 		emit exit();
+	} else if (*it == "connect") {
+		emit cl_connect();
 	} else if (*it == "disconnect") {
 		emit disconnect();
 	}
