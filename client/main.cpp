@@ -1,10 +1,14 @@
 #include <iostream>
+#include <QtGui>
 #include <client/client.hpp>
+#include <client/gui/mainwidget.hpp>
 #include <exceptions.hpp>
 
 using namespace fdgo;
+using namespace fdgo::client;
 
 int main(int argc, char** argv) {
+#if 0
 	try {
 		client::Client c(argc, argv);
 		c.connect();
@@ -30,5 +34,9 @@ int main(int argc, char** argv) {
 			std::cerr << boost::diagnostic_information(e);
 		#endif
 	}
-	return 0;
+#endif
+	QApplication qapp(argc, argv);
+	gui::MainWidget mw;
+	mw.show();
+	return qapp.exec();
 }
