@@ -37,7 +37,8 @@ Object::Pointer Object::makeFromIncoming(tcp::socket& sock) {
 			p.reset(new Undo(h));
 			break;
 		case Header::History:
-			BOOST_THROW_EXCEPTION(ExcNotImplemented());
+			p.reset(new History(h));
+			break;
 		case Header::CloseConnection:
 			p.reset(new CloseConnection(h));
 			break;
@@ -48,8 +49,18 @@ Object::Pointer Object::makeFromIncoming(tcp::socket& sock) {
 	return p;
 }
 
-Header::Type Object::getType() {
+Header::Type Object::getType() const {
 	return header_.getType();
+}
+
+void Object::checkError(boost::system::error_code error, size_t len) {
+	if (error == boost::asio::error::eof)
+		BOOST_THROW_EXCEPTION(ExcDisconnect());
+	else if (error)
+		BOOST_THROW_EXCEPTION(boost::system::system_error(error));
+
+	if (len != header_.getLength())
+		BOOST_THROW_EXCEPTION(ExcWriteLengthMismatch());
 }
 
 }

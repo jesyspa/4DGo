@@ -38,10 +38,10 @@ class Header {
 	Header();
 	Header(int type, int length);
 
-	bool versionsMatch();
-	Type getType();
+	bool versionsMatch() const;
+	Type getType() const;
 	void setType(int type);
-	size_t getLength();
+	size_t getLength() const;
 	void setLength(size_t length);
 
 	void write(boost::asio::ip::tcp::socket& sock);
@@ -50,8 +50,10 @@ class Header {
     private:
 	template<typename T>
 	T& msgAs(size_t index);
+	template<typename T>
+	T const& msgAs(size_t index) const;
 
-	uint32_t getVersion();
+	uint32_t getVersion() const;
 	void setVersion(uint32_t vs);
 
 	boost::array<uint8_t, hs> msg;

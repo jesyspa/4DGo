@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include <boost/shared_ptr.hpp>
 #include <move.hpp>
 
 namespace fdgo {
@@ -19,11 +20,13 @@ class History {
 	History(History const&); 
 	History& operator=(History const&);
     public:
-	History(); 
+	typedef boost::shared_ptr<History> Pointer;
+	History(bool useStack = true); 
 	~History();
 	void placeStone(bool black, Position const& pos);
-	void removeStone(Position const& pos);
+	void removeStone(bool black, Position const& pos);
 	void pass(bool black);
+	void addNull();
 	Move::MType lastMoveType();
 	Move popLastMove();
 
@@ -33,7 +36,9 @@ class History {
 
 	void writeToDisk(std::string filename);
     private:
+	void push(Move const& mv);
 	int locked_;
+	bool useStack_;
 	std::vector<Move> mvec_;
 	std::stack<Move> mstack_;
 };

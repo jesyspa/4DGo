@@ -8,7 +8,9 @@
 #include <client/fakegoban.hpp>
 #include <net/object.hpp>
 #include <net/header.hpp>
+#include <net/history.hpp>
 #include <history.hpp>
+#include <histlock.hpp>
 
 namespace fdgo {
 
@@ -45,11 +47,13 @@ class Client {
 	net::Object::Pointer expect();
 
 	void play(Move const& mv);
+	void touchHistory(net::History::Pointer nhip);
 	void draw();
 
 	FakeGoban goban_;
 	Chatbox cbox_;
 	History hist_;
+	HistLock* hlock_;
 
 	boost::asio::io_service io_;
 	boost::asio::ip::tcp::socket sock_;

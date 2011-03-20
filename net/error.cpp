@@ -27,17 +27,9 @@ Error::Error(int er, std::string const& str) {
 
 void Error::write(tcp::socket& sock) {
 	header_.write(sock);
-	msg_.resize(header_.getLength()); // Unnecessary?
-
 	boost::system::error_code error;
 	size_t len = sock.write_some(boost::asio::buffer(msg_.data(), msg_.size()), error);
-	if (error == boost::asio::error::eof)
-		BOOST_THROW_EXCEPTION(ExcDisconnect());
-	else if (error)
-		BOOST_THROW_EXCEPTION(boost::system::system_error(error));
-
-	if (len != header_.getLength())
-		BOOST_THROW_EXCEPTION(ExcWriteLengthMismatch());
+	checkError(error, len);
 }
 
 Error::EType Error::getError() {
@@ -79,16 +71,9 @@ T& Error::msgAs(size_t index) {
 
 void Error::read(tcp::socket& sock) {
 	msg_.resize(header_.getLength());
-
 	boost::system::error_code error;
 	size_t len = sock.read_some(boost::asio::buffer(msg_.data(), msg_.size()), error);
-	if (error == boost::asio::error::eof)
-		BOOST_THROW_EXCEPTION(ExcDisconnect());
-	else if (error)
-		BOOST_THROW_EXCEPTION(boost::system::system_error(error));
-
-	if (len != header_.getLength())
-		BOOST_THROW_EXCEPTION(ExcReadLengthMismatch());
+	checkError(error, len);
 }
 
 }

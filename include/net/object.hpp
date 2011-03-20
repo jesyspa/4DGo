@@ -24,13 +24,14 @@ class Object : public boost::enable_shared_from_this<Object> {
 
 	//! Writes the object, including the header, over the socket.
 	virtual void write(boost::asio::ip::tcp::socket& sock) = 0;
-	Header::Type getType();
+	Header::Type getType() const;
 
     protected:
 	//! Reads the object, not counting the header, over the socket. The
 	//! header does not need to be read, because it has already been read
 	//! in order to decide the type.
 	virtual void read(boost::asio::ip::tcp::socket& sock) = 0;
+	virtual void checkError(boost::system::error_code error, size_t len);
 	Header header_;
 };
 

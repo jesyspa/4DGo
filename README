@@ -5,11 +5,11 @@ Currently implemented:
 - Automatic removal of surrounded chains
 - Possibility to save
 - Undo
+- Server-client split
 
-Currently working on:
-- Split into server and client
+Next goal:
+- Graphical client
 
 Needs doing:
 - Counting score
-- Graphical client
-
+- Ko

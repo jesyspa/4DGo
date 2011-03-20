@@ -41,7 +41,7 @@ void Goban::removeStone(Position const& pos) {
 }
 
 void Goban::noteStoneRemoval(Intersection* itr, bool black) {
-	hist_.removeStone(getPosition(itr));
+	hist_.removeStone(black, getPosition(itr));
 	if (black)
 		blackPrisoners_++;
 	else

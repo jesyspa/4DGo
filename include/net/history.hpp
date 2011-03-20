@@ -1,5 +1,5 @@
-#ifndef FDGO_INCLUDE_NET_GREETING_HPP
-#define FDGO_INCLUDE_NET_GREETING_HPP
+#ifndef FDGO_INCLUDE_NET_HISTORY_HPP
+#define FDGO_INCLUDE_NET_HISTORY_HPP
 
 #include <string>
 #include <vector>
@@ -18,21 +18,25 @@ namespace net {
 //! 
 //! double komi
 
-class Greeting : public Object {
+class History : public Object {
     public:
-	typedef boost::shared_ptr<Greeting> Pointer;
+	typedef boost::shared_ptr<History> Pointer;
 
-	Greeting(); 
-	Greeting(float komi, bool black);
-	Greeting(Header const& header);
+	enum AType {
+		lock,
+		unlock,
+		pop
+	};
+
+	History(); 
+	History(int action);
+	History(Header const& header);
 	void write(boost::asio::ip::tcp::socket& sock);
-	bool getBlack();
-	void setBlack(bool black);
-	float getKomi();
-	void setKomi(float komi);
+	AType getAction();
+	void setAction(int action);
 
     private:
-	static const size_t size_ = 16;
+	static const size_t size_ = 4;
 	void read(boost::asio::ip::tcp::socket& sock);
 
 	template<typename T>

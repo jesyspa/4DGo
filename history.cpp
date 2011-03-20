@@ -7,34 +7,26 @@
 
 namespace fdgo {
 
-History::History() : locked_(0) {
+History::History(bool useStack) : locked_(0), useStack_(useStack) {
 }
 
 History::~History() {
 }
 
 void History::placeStone(bool black, Position const& pos) {
-	if (locked_) {
-		return;
-	}
-	Move m(black, pos, Move::play);
-	mstack_.push(m);
+	push(Move(black, pos, Move::play));
 }
 
-void History::removeStone(Position const& pos) {
-	if (locked_) {
-		return;
-	}
-	Move m(false, pos, Move::remove);
-	mstack_.push(m);
+void History::removeStone(bool black, Position const& pos) {
+	push(Move(black, pos, Move::remove));
 }
 
 void History::pass(bool black) {
-	if (locked_) {
-		return;
-	}
-	Move m(black, Position(), Move::pass);
-	mstack_.push(m);
+	push(Move(black, Position(), Move::pass));
+}
+
+void History::addNull() {
+	push(Move(false, Position(), Move::none));
 }
 
 void History::writeToDisk(std::string filename) {
@@ -69,6 +61,15 @@ bool History::unhandledMoves() {
 void History::confirmTop() {
 	mvec_.push_back(mstack_.top());
 	mstack_.pop();
+}
+
+void History::push(Move const& mv) {
+	if (locked_)
+		return;
+	if (useStack_)
+		mstack_.push(mv);
+	else
+		mvec_.push_back(mv);
 }
 
 }

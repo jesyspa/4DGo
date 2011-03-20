@@ -17,12 +17,12 @@ Header::Header(int type, int length) {
 	setLength(length);
 }
 
-bool Header::versionsMatch() {
+bool Header::versionsMatch() const {
 	return ((getVersion() & ~0xFF) == (version & ~0xFF));
 }
 
-Header::Type Header::getType() {
-	return Type(msgAs<uint16_t>(4));
+Header::Type Header::getType() const {
+	return Type(msgAs<const uint16_t>(4));
 }
 
 void Header::setType(int type) {
@@ -31,8 +31,8 @@ void Header::setType(int type) {
 	msgAs<uint16_t>(4) = type;
 }
 
-size_t Header::getLength() {
-	return msgAs<uint16_t>(6);
+size_t Header::getLength() const {
+	return msgAs<const uint16_t>(6);
 }
 
 void Header::setLength(size_t length) {
@@ -70,8 +70,13 @@ T& Header::msgAs(size_t index) {
 	return *(reinterpret_cast<T*>(&msg[index]));
 }
 
-uint32_t Header::getVersion() {
-	return msgAs<uint32_t>(0);
+template<typename T>
+T const& Header::msgAs(size_t index) const {
+	return *(reinterpret_cast<T*>(&msg[index]));
+}
+
+uint32_t Header::getVersion() const {
+	return msgAs<const uint32_t>(0);
 }
 
 void Header::setVersion(uint32_t vs) {

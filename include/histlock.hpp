@@ -1,7 +1,9 @@
 #ifndef FDGO_INCLUDE_HISTLOCK_HPP
 #define FDGO_INCLUDE_HISTLOCK_HPP
 
+#include <boost/asio.hpp>
 #include <history.hpp>
+#include <net/history.hpp>
 
 namespace fdgo {
 
@@ -19,14 +21,25 @@ class HistLock {
 	HistLock(HistLock const&); 
 	HistLock& operator=(HistLock const&);
     public:
-	HistLock(History& m) : m_(m) {
-		m_.locked_++;
+	HistLock(History* h, boost::asio::ip::tcp::socket* sock = 0) : h_(h), sock_(sock), locked_(true) {
+		if (sock_) {
+			net::History nhi(net::History::lock);
+			nhi.write(*sock_);
+		}
+		h_->locked_++;
 	}
+
 	~HistLock() {
-		m_.locked_--;
+		if (sock_) {
+			net::History nhi(net::History::unlock);
+			nhi.write(*sock_);
+		}
+		h_->locked_--;
 	}
     private:
-	History& m_;
+	History* h_;
+	boost::asio::ip::tcp::socket* sock_;
+	bool locked_;
 };
 
 }

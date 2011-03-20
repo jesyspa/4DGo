@@ -82,6 +82,9 @@ void Server::listen() {
 				tryPlay(nmvp->getMove());
 				nn.write(sock);
 				return;
+			} else if(nobp->getType() == net::Header::Undo ) {
+				undo();
+				return;
 			} else if(nobp->getType() == net::Header::History) {
 				BOOST_THROW_EXCEPTION(ExcNotImplemented());
 			} else if(nobp->getType() == net::Header::CloseConnection) {
@@ -166,16 +169,22 @@ void Server::tryPlay(Move const& mv) {
 }
 
 void Server::undo() {
-	HistLock hlock(hist_);
+	HistLock bHlock(&hist_, &bCon_->socket());
+	HistLock wHlock(&hist_, &wCon_->socket());
+	net::History nhi(net::History::pop);
+	nhi.write(bCon_->socket());
+	nhi.write(wCon_->socket());
 	Move lastmove;
 	while (hist_.lastMoveType() == Move::remove) {
 		lastmove = hist_.popLastMove();
 		goban_.placeStone(!lastmove.black, lastmove.pos);
+		broadcast(Move(lastmove.black, lastmove.pos, Move::play));
 	}
 	lastmove = hist_.popLastMove();
-	goban_.removeStone(lastmove.pos);
 	if (lastmove.type != Move::play)
-		throw ExcNothingToUndo();
+		return;
+	goban_.removeStone(lastmove.pos);
+	broadcast(Move(lastmove.black, lastmove.pos, Move::remove));
 }
 
 }

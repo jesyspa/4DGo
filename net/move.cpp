@@ -30,16 +30,9 @@ Move::Move(Header const& header) : Object(header) {
 
 void Move::write(tcp::socket& sock) {
 	header_.write(sock);
-
 	boost::system::error_code error;
 	size_t len = sock.write_some(boost::asio::buffer(msg_, size_), error);
-	if (error == boost::asio::error::eof)
-		BOOST_THROW_EXCEPTION(ExcDisconnect());
-	else if (error)
-		BOOST_THROW_EXCEPTION(boost::system::system_error(error));
-
-	if (len != header_.getLength())
-		BOOST_THROW_EXCEPTION(ExcWriteLengthMismatch());
+	checkError(error, len);
 }
 
 fdgo::Move Move::getMove() {
@@ -54,15 +47,8 @@ void Move::setMove(fdgo::Move const& mv) {
 
 void Move::read(tcp::socket& sock) {
 	boost::system::error_code error;
-
 	size_t len = sock.read_some(boost::asio::buffer(msg_, size_), error);
-	if (error == boost::asio::error::eof)
-		BOOST_THROW_EXCEPTION(ExcDisconnect());
-	else if (error)
-		BOOST_THROW_EXCEPTION(boost::system::system_error(error));
-
-	if (len != header_.getLength())
-		BOOST_THROW_EXCEPTION(ExcReadLengthMismatch());
+	checkError(error, len);
 }
 
 template <typename T>

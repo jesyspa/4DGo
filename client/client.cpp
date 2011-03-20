@@ -25,7 +25,7 @@ const boost::regex Client::rgxSave("^save$");
 const boost::regex Client::rgxGetScore("^score$"); // Not used
 const boost::regex Client::rgxExit("^exit$");
 
-Client::Client(int argc, char** argv) : sock_(io_), ip_("localhost"), port_("15493"), colour_("Unknown") {
+Client::Client(int argc, char** argv) : hist_(false), hlock_(0), sock_(io_), ip_("localhost"), port_("15493"), colour_("Unknown") {
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "show help message")
@@ -50,6 +50,7 @@ Client::Client(int argc, char** argv) : sock_(io_), ip_("localhost"), port_("154
 }
 
 Client::~Client() {
+	delete hlock_;
 }
 
 void Client::connect() {
@@ -84,31 +85,44 @@ void Client::run() {
 
 void Client::listen() {
 	for (;;) {
-		// Not using a switch to be able to only create the objects I need.
-		net::Object::Pointer nobp = net::Object::makeFromIncoming(sock_);
-		if(nobp->getType() == net::Header::Null) {
-			return;
-		} else if(nobp->getType() == net::Header::Error) {
-			net::Error::Pointer nerrp;
-			nerrp = boost::dynamic_pointer_cast<net::Error>(nobp);
-			nerrp->throwSelf();
-		} else if(nobp->getType() == net::Header::Message) {
-			net::Message::Pointer nmsgp;
-			nmsgp = boost::dynamic_pointer_cast<net::Message>(nobp);
-			cbox_.addMessage(nmsgp->getString());
-		} else if(nobp->getType() == net::Header::Move) {
-			net::Move::Pointer nmvp;
-			nmvp = boost::dynamic_pointer_cast<net::Move>(nobp);
-			play(nmvp->getMove());
+		try {
+			// Not using a switch to be able to only create the objects I need.
+			net::Object::Pointer nobp = net::Object::makeFromIncoming(sock_);
+			if(nobp->getType() == net::Header::Null) {
+				return;
+			} else if(nobp->getType() == net::Header::Error) {
+				net::Error::Pointer nerrp;
+				nerrp = boost::dynamic_pointer_cast<net::Error>(nobp);
+				nerrp->throwSelf();
+			} else if(nobp->getType() == net::Header::Message) {
+				net::Message::Pointer nmsgp;
+				nmsgp = boost::dynamic_pointer_cast<net::Message>(nobp);
+				cbox_.addMessage(nmsgp->getString());
+			} else if(nobp->getType() == net::Header::Move) {
+				net::Move::Pointer nmvp;
+				nmvp = boost::dynamic_pointer_cast<net::Move>(nobp);
+				play(nmvp->getMove());
+				draw();
+			} else if(nobp->getType() == net::Header::History) {
+				net::History::Pointer nhip;
+				nhip = boost::dynamic_pointer_cast<net::History>(nobp);
+				touchHistory(nhip);
+			} else if(nobp->getType() == net::Header::CloseConnection) {
+				net::CloseConnection ncc;
+				ncc.write(sock_);
+				BOOST_THROW_EXCEPTION(ExcSafeDisconnect());
+			} else {
+				BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
+			}
+		}
+		catch (ExcNonFatal& e) {
+			if (std::string const* msg = boost::get_error_info<err_msg>(e))
+				cbox_.addMessage(std::string("Error: " + *msg));
+			#ifndef NDEBUG
+				std::cerr << "\nDiagnostics info:\n";
+				std::cerr << boost::diagnostic_information(e);
+			#endif
 			draw();
-		} else if(nobp->getType() == net::Header::History) {
-			BOOST_THROW_EXCEPTION(ExcNotImplemented());
-		} else if(nobp->getType() == net::Header::CloseConnection) {
-			net::CloseConnection ncc;
-			ncc.write(sock_);
-			BOOST_THROW_EXCEPTION(ExcSafeDisconnect());
-		} else {
-			BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
 		}
 	}
 }
@@ -130,6 +144,8 @@ void Client::takeInput() {
 			} else if (regex_match(input, rgxUndo)) {
 				sendUndo();
 				cbox_.addMessage("Last move undone.");
+				draw();
+				return;
 			} else if (regex_match(input, rgxSave)) {
 				hist_.writeToDisk("log.txt");
 				cbox_.addMessage("Game saved.");
@@ -202,6 +218,7 @@ net::Object::Pointer Client::expect() {
 void Client::play(Move const& mv) {
 	switch (mv.type) {
 		case Move::none:
+			hist_.addNull();
 			return;
 		case Move::pass:
 			break;
@@ -213,6 +230,25 @@ void Client::play(Move const& mv) {
 			break;
 		default:
 			BOOST_THROW_EXCEPTION(ExcInvalidMove());
+	}
+}
+
+void Client::touchHistory(net::History::Pointer nhip) {
+	switch (nhip->getAction()) {
+		case net::History::lock:
+			if (hlock_)
+				break;
+			hlock_ = new HistLock(&hist_);
+			break;
+		case net::History::unlock:
+			delete hlock_;
+			hlock_ = 0;
+			break;
+		case net::History::pop:
+			while (hist_.lastMoveType() == Move::remove)
+				hist_.popLastMove(); // Get rid of removals.
+			hist_.popLastMove(); // Get rid of the placement.
+			break;
 	}
 }
 

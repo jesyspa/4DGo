@@ -9,6 +9,7 @@
 #include <net/message.hpp>
 #include <net/move.hpp>
 #include <net/undo.hpp>
+#include <net/history.hpp>
 #include <net/close.hpp>
 
 #endif // Guard

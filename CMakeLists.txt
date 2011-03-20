@@ -9,7 +9,7 @@ LINK_LIBRARIES( boost_program_options boost_regex boost_date_time
 
 SET( NETWORK_SOURCE_FILES
 	net/header net/object net/null net/greeting net/error "net/message"
-	net/move net/undo net/close 
+	net/move net/undo net/history net/close 
 	)
 
 SET( SHARED_SOURCE_FILES
