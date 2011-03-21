@@ -10,7 +10,6 @@ Currently implemented:
 - Killing groups
 
 Needs doing:
-- Keeping track of prisoners
 - Asking confirmation for undo/kill
 - Kill on enemy turn
 - Counting score

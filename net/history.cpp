@@ -19,10 +19,14 @@ History::History(Header const& header) : Object(header) {
 		BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
 }
 
-void History::printOn(QDataStream&) const {
+void History::printOn(QDataStream& ds) const {
+	ds << qint32(action);
 }
 
-void History::readFrom(QDataStream&) {
+void History::readFrom(QDataStream& ds) {
+	qint32 tmp;
+	ds >> tmp;
+	action = AType(tmp);
 }
 
 }

@@ -75,22 +75,28 @@ void Chatbox::parseString(QString str) {
 	QStringList::const_iterator it = list.begin();
 	if (it->contains(rgxPos)) {
 		emit playStone(Position(*it));
-	} else if (*it == "pass") {
+	} else if (*it == "pass" || *it == "p") {
 		emit pass();
-	} else if (*it == "undo") {
+	} else if (*it == "undo" || *it == "u") {
 		emit undo();
-	} else if (*it == "kill") {
+	} else if (*it == "kill" || *it == "k") {
 		if (++it == list.end() || !it->contains(rgxPos))
 			tbCBox_->append("Expected position as second argument.");
 		else
 			emit kill(Position(*it));
-	} else if (*it == "exit") {
+	} else if (*it == "exit" || *it == "e") {
 		emit exit();
-	} else if (*it == "connect") {
+	} else if (*it == "connect" || *it == "c") {
+		if (++it != list.end()) {
+			emit setHost(*it);
+			if (++it != list.end()) {
+				emit setPort(it->toInt());
+			}
+		}
 		emit cl_connect();
-	} else if (*it == "disconnect") {
+	} else if (*it == "disconnect" || *it == "dc") {
 		emit cl_disconnect();
-	} else if (*it == "save") {
+	} else if (*it == "save" || *it == "s") {
 		if (++it == list.end())
 			tbCBox_->append("Expected filename as second argument.");
 		else

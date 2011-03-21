@@ -13,7 +13,7 @@
 namespace fdgo {
 namespace client {
 
-Client::Client(QObject* parent) : QObject(parent), hist_(false), hlock_(0), connected_(false) {
+Client::Client(QObject* parent) : QObject(parent), hist_(false), hlock_(0), blackCaps_(0), whiteCaps_(0), connected_(false) {
 	host_ = "localhost";
 	port_ = 15493;
 	sock_ = new QTcpSocket(this);
@@ -27,6 +27,14 @@ Client::Client(QObject* parent) : QObject(parent), hist_(false), hlock_(0), conn
 
 Client::~Client() {
 	delete hlock_;
+}
+
+void Client::setHost(QString const& str) {
+	host_ = str;
+}
+
+void Client::setPort(int p) {
+	port_ = p;
 }
 
 void Client::cl_connect() {
@@ -70,6 +78,7 @@ void Client::cl_disconnect() {
 	emit clear();
 	sock_->close();
 	connected_ = false;
+	hist_.clear();
 	disconnect(    sock_, SIGNAL(readyRead()),
 	                this, SLOT(  listen())
 	       );
@@ -201,6 +210,15 @@ void Client::play(Move const& mv) {
 			break;
 		case Move::remove:
 			hist_.removeStone(mv.black, mv.pos);
+			if (!hlock_) {
+				if (mv.black) {
+					blackCaps_++;
+					emit setBlackCapsVal(blackCaps_);
+				} else {
+					whiteCaps_++;
+					emit setWhiteCapsVal(whiteCaps_);
+				}
+			}
 			emit removeStone(mv.pos);
 			break;
 		default:
@@ -209,6 +227,7 @@ void Client::play(Move const& mv) {
 }
 
 void Client::touchHistory(net::History::Pointer nhip) {
+	Move mv;
 	switch (nhip->action) {
 		case net::History::lock:
 			if (hlock_)
@@ -220,7 +239,17 @@ void Client::touchHistory(net::History::Pointer nhip) {
 			hlock_ = 0;
 			break;
 		case net::History::pop:
-			hist_.undoLastMove();
+			while ((mv = hist_.popLastMove()).type != Move::none) {
+				if (mv.type == Move::remove) {
+					if (mv.black) {
+						blackCaps_--;
+						emit setBlackCapsVal(blackCaps_);
+					} else {
+						whiteCaps_--;
+						emit setWhiteCapsVal(whiteCaps_);
+					}
+				}
+			}
 			break;
 		case net::History::null:
 			hist_.addNull();

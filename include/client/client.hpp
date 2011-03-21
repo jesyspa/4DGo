@@ -31,6 +31,8 @@ class Client : public QObject {
 	~Client();
 
     public slots:
+	void setHost(QString const& str);
+	void setPort(int p);
 	void cl_connect();
 	void cl_disconnect();
 
@@ -76,6 +78,8 @@ class Client : public QObject {
 	QTcpSocket* sock_;
 	QString host_;
 	int port_;
+	int blackCaps_;
+	int whiteCaps_;
 
 	double komi_;
 	bool black_;

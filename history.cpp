@@ -47,14 +47,12 @@ void History::writeToDisk(QString const& filename) {
 	log.flush();
 }
 
-void History::undoLastMove() {
+Move History::popLastMove() {
 	if (mlist_.empty()) 
-		return;
-	mlist_.pop_back(); // The null
-	while (!mlist_.empty() && mlist_.back().type == Move::remove) 
-		mlist_.pop_back(); // The removes
-	if (!mlist_.empty()) // The placement
-		mlist_.pop_back();
+		return Move();
+	Move mv = mlist_.back();
+	mlist_.pop_back();
+	return mv;
 }
 
 int History::seekLastTurn() {
@@ -77,6 +75,11 @@ Move::MType History::getType(int i) {
 	if (i >= mlist_.size() || i < 0)
 		return Move::none;
 	return mlist_[i].type;
+}
+
+void History::clear() {
+	mlist_.erase(mlist_.begin(), mlist_.end());
+	mstack_.erase(mstack_.begin(), mstack_.end());
 }
 
 Move History::peekStack() {

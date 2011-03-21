@@ -90,6 +90,12 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent) {
 	connect(       cbox_, SIGNAL(exit()),
 	             client_, SLOT(  exit())
 	       );
+	connect(       cbox_, SIGNAL(setHost(QString const&)),
+	             client_, SLOT(  setHost(QString const&))
+	       );
+	connect(       cbox_, SIGNAL(setPort(int)),
+	             client_, SLOT(  setPort(int))
+	       );
 	connect(       cbox_, SIGNAL(cl_connect()),
 	             client_, SLOT(  cl_connect())
 	       );

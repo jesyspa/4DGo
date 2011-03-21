@@ -34,6 +34,8 @@ class Chatbox : public QWidget {
 	void undo();
 	void pass();
 	void kill(Position const& pos);
+	void setHost(QString const& str);
+	void setPort(int p);
 	void cl_connect();
 	void cl_disconnect();
 	void writeLogToDisk(QString const& str);

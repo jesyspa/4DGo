@@ -27,10 +27,11 @@ class History {
 	void pass(bool black);
 	void kill(Position const& pos);
 	void addNull();
-	void undoLastMove();
+	Move popLastMove();
 	int seekLastTurn();
 	Move remove(int i);
 	Move::MType getType(int i);
+	void clear();
 
 	Move peekStack();
 	bool unhandledMoves();

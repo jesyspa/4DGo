@@ -193,17 +193,17 @@ void Server::broadcastMoves() {
 }
 
 void Server::tryPlay(Move const& mv) {
+	if (mv.type == Move::kill) {
+		goban_.killGroup(mv.pos);
+		hist_.addNull();
+		return;
+	}
 	if (mv.black != blackTurn_)
 		BOOST_THROW_EXCEPTION(ExcInvalidMove() << err_msg("Move played by wrong colour!"));
 	if (mv.type == Move::pass) {
 		broadcast(QString(blackTurn_ ? "Black" : "White") + " has passed.");
 		hist_.pass(mv.black);
 		setTurn(!blackTurn_);
-		hist_.addNull();
-		return;
-	}
-	if (mv.type == Move::kill) {
-		goban_.killGroup(mv.pos);
 		hist_.addNull();
 		return;
 	}
