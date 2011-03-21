@@ -1,9 +1,8 @@
 #ifndef FDGO_INCLUDE_POSITION_HPP
 #define FDGO_INCLUDE_POSITION_HPP
 
-#include <cstdint>
-#include <string>
-#include <boost/regex.hpp>
+#include <QString>
+#include <QRegExp>
 #include <boost/array.hpp>
 
 namespace fdgo {
@@ -14,10 +13,10 @@ namespace fdgo {
 
 struct Position {
 	Position();
-	Position(std::string const& str);
+	Position(QString const& str);
 	Position(int a, int b, int c, int d);
-	uint32_t& operator[](size_t i);
-	uint32_t const& operator[](size_t i) const;
+	quint32& operator[](size_t i);
+	quint32 const& operator[](size_t i) const;
 	Position up() const {
 		Position pos = *this;
 		pos[3]++;
@@ -58,18 +57,18 @@ struct Position {
 		pos[0]++;
 		return pos;
 	}
-	std::string toString() const {
-		std::string s("Lnln");
-		s[0] = arr_[0] + 'A';
-		s[1] = arr_[1] + '1';
-		s[2] = arr_[2] + 'a';
-		s[3] = arr_[3] + '1';
+	QString toString() const {
+		QString s;
+		s += arr_[0] + 'A';
+		s += arr_[1] + '1';
+		s += arr_[2] + 'a';
+		s += arr_[3] + '1';
 		return s;
 	}
 
     private:
-	boost::array<uint32_t,4> arr_;
-	static const boost::regex validPos_;
+	boost::array<quint32,4> arr_;
+	static const QRegExp validPos_;
 };
 
 }

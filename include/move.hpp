@@ -1,7 +1,7 @@
 #ifndef FDGO_INCLUDE_MOVE_HPP
 #define FDGO_INCLUDE_MOVE_HPP
 
-#include <string>
+#include <QString>
 #include <position.hpp>
 
 namespace fdgo {
@@ -14,12 +14,13 @@ class Move {
 		none,
 		pass,
 		play,
-		remove
+		remove,
+		kill
 	} type;
 	Move(); 
 	Move(Move const&); 
 	Move(bool blck, Position const& ps, MType movetype);
-	std::string toString();
+	QString toString() const;
 	bool black;
 	Position pos;
 };

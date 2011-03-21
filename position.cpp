@@ -1,29 +1,29 @@
-#include <string>
-#include <boost/regex.hpp>
+#include <QString>
+#include <QRegExp>
 #include <position.hpp>
 #include <exceptions.hpp>
 
 namespace fdgo {
 
-const boost::regex Position::validPos_("^[A-D][1-4][a-d][1-4]$");
+const QRegExp Position::validPos_("^[A-D][1-4][a-d][1-4]$");
 
 Position::Position() {
 	for (int a = 0; a < 4; ++a)
 		arr_[a] = 0;
 }
 
-Position::Position(std::string const& str) {
+Position::Position(QString const& str) {
 	#ifndef NDEBUG
 	// Check for illegal string. Should be done elsewhere already, so only
 	// doing it when debugging.
-	if (!regex_match(str, validPos_)) {
+	if (!str.contains(validPos_)) {
 		BOOST_THROW_EXCEPTION(ExcInvalidPos()); 
 	}
 	#endif
-	arr_[0] = str[0] - 'A';
-	arr_[1] = str[1] - '1';
-	arr_[2] = str[2] - 'a';
-	arr_[3] = str[3] - '1';
+	arr_[0] = str.toAscii()[0] - 'A';
+	arr_[1] = str.toAscii()[1] - '1';
+	arr_[2] = str.toAscii()[2] - 'a';
+	arr_[3] = str.toAscii()[3] - '1';
 }
 
 Position::Position(int a, int b, int c, int d) {
@@ -33,14 +33,14 @@ Position::Position(int a, int b, int c, int d) {
 	arr_[3] = d;
 }
 
-uint& Position::operator[](size_t i) {
+quint32& Position::operator[](size_t i) {
 	if (i > 3)
 		return arr_[0];
 	else
 		return arr_[i];
 }
 
-uint const& Position::operator[](size_t i) const {
+quint32 const& Position::operator[](size_t i) const {
 	if (i > 3)
 		return arr_[0];
 	else

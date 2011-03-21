@@ -1,3 +1,4 @@
+#include <QDataStream>
 #include <net/null.hpp>
 #include <exceptions.hpp>
 
@@ -7,21 +8,18 @@ namespace fdgo {
 namespace net {
 
 Null::Null() {
-	header_.setType(Header::Null);
-	header_.setLength(0);
+	header_.type = Header::Null;
 }
 
 Null::Null(Header const& header) : Object(header) {
-	if (header_.getType() != Header::Null)
+	if (header_.type != Header::Null)
 		BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
 }
 
-void Null::write(tcp::socket& sock) {
-	header_.write(sock);
+void Null::printOn(QDataStream&) const {
 }
 
-void Null::read(tcp::socket&) {
-	// Intentionally left blank -- a null packet shouldn't contain anything.
+void Null::readFrom(QDataStream&) {
 }
 
 }

@@ -19,12 +19,13 @@ class Goban : public QWidget {
     public:
 	Goban(QWidget* parent = 0);
 
+    public slots:
 	void placeStone(bool black, Position const& pos);
 	void removeStone(Position const& pos);
+	void clear();
 
     private:
 	void setIcon(size_t a, size_t b, size_t c, size_t d, char icon);
-	void clear();
 
 	QGridLayout* glMain_;
 	boost::array<boost::array<GobanSlice*, 4>, 4> grid_;

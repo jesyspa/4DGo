@@ -1,10 +1,9 @@
-#include <sstream>
 #include <move.hpp>
 #include <exceptions.hpp>
 
 namespace fdgo {
 
-Move::Move() : type(pass), black(false), pos(0, 0, 0, 0) {
+Move::Move() : type(none), black(false), pos(0, 0, 0, 0) {
 }
 
 Move::Move(Move const& mov) : type(mov.type), black(mov.black), pos(mov.pos) {
@@ -13,26 +12,31 @@ Move::Move(Move const& mov) : type(mov.type), black(mov.black), pos(mov.pos) {
 Move::Move(bool blck, Position const& ps, MType movetype) : type(movetype), black(blck), pos(ps) {
 }
 
-std::string Move::toString() {
-	std::stringstream ss;
+QString Move::toString() const {
+	QString s;
 	switch (type) {
 		case play:
-			ss << (black ? "B" : "W");
-			ss << " ";
-			ss << pos.toString();
+			s = (black ? "B" : "W");
+			s += " ";
+			s += pos.toString();
+			s += '\n';
 			break;
 		case remove:
-			ss << "R ";
-			ss << pos.toString();
+			s = "R ";
+			s += pos.toString();
+			s += '\n';
 			break;
 		case pass:
-			ss << (black ? "B" : "W");
-			ss << " PASS";
+			s = (black ? "B" : "W");
+			s += " PASS\n";
+			break;
+		case none:
+		case kill:
 			break;
 		default:
-			ss << "Unknown move";
+			s = "Unknown move\n";
 	}
-	return ss.str();
+	return s;
 }
 
 }

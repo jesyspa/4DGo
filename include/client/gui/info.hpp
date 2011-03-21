@@ -19,8 +19,8 @@ class Info : public QWidget {
 
     public slots:
 	void setColour(bool black);
-	void setKomi(float komi);
 	void setTurn(bool black);
+	void setKomi(double komi);
 	void setBlackCaps(int caps);
 	void setWhiteCaps(int caps);
 	void setConnection(QString const& str);

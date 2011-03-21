@@ -25,24 +25,17 @@ class History : public Object {
 	enum AType {
 		lock,
 		unlock,
-		pop
-	};
+		pop,
+		null
+	} action;
 
 	History(); 
 	History(int action);
 	History(Header const& header);
-	void write(boost::asio::ip::tcp::socket& sock);
-	AType getAction();
-	void setAction(int action);
 
-    private:
-	static const size_t size_ = 4;
-	void read(boost::asio::ip::tcp::socket& sock);
-
-	template<typename T>
-	T& msgAs(size_t index);
-
-	boost::array<char,size_> msg_;
+    protected:
+	void printOn(QDataStream& ds) const;
+	void readFrom(QDataStream& ds);
 };
 
 }

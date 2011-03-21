@@ -1,50 +1,48 @@
-#include <vector>
-#include <iterator>
+#include <QList>
 #include <server/chain.hpp>
 #include <server/stone.hpp>
 #include <exceptions.hpp>
-
-typedef unsigned int uint;
 
 namespace fdgo {
 namespace server {
 
 Chain::Chain(Stone* st) : black_(st->black_) {
-	stonevec_.push_back(st);
+	stoneli_.push_back(st);
 }
 
+Chain::~Chain() {}
+
 void Chain::addStone(Stone* st) {
-	stonevec_.push_back(st);
-	st->chain_.reset(this);
+	stoneli_.push_back(st);
+	st->chain_ = this;
 }
 
 void Chain::removeStone(Stone* st) {
-	std::vector<Stone*>::iterator it = stonevec_.begin();
-	while (it != stonevec_.end()) {
-		if (*it == st) {
-			stonevec_.erase(it);
-			break;
+	for (int i = 0; i < stoneli_.size(); ++i) {
+		if (stoneli_[i] == st) {
+			stoneli_.removeAt(i);
+			return;
 		}
 	}
 }
 
 bool Chain::checkLiberties() {
-	for (uint i = 0; i < stonevec_.size(); ++i) {
-		if (stonevec_[i]->libs)
+	for (int i = 0; i < stoneli_.size(); ++i) {
+		if (stoneli_[i]->libs)
 			return true;
 	}
 	return false;
 }
 
-void Chain::joinWith(Chain::Pointer ch) {
-	if (ch.get() == this)
+void Chain::joinWith(Chain* ch) {
+	if (ch == this)
 		return;
-	int end = ch->stonevec_.size(); 
-	for (int i = 0; i < end; ++i) {
-		stonevec_.push_back(ch->stonevec_.back());
-		ch->stonevec_.back()->chain_.reset(this);
-		ch->stonevec_.pop_back();
+	while(!ch->stoneli_.empty()) {
+		stoneli_.push_back(ch->stoneli_.back());
+		ch->stoneli_.pop_back();
+		stoneli_.back()->chain_ = this;
 	}
+	delete ch;
 }
 
 void Chain::considerDying(bool forbid) {
@@ -56,9 +54,9 @@ void Chain::considerDying(bool forbid) {
 }
 
 void Chain::die() {
-	for (uint i = 0; i < stonevec_.size(); ++i) {
-		delete stonevec_[i];
-	}
+	while (!stoneli_.isEmpty())
+		delete stoneli_.takeFirst();
+	delete this;
 }
 
 }

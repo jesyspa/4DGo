@@ -1,15 +1,14 @@
 #ifndef FDGO_INCLUDE_CLIENT_CLIENT_HPP
 #define FDGO_INCLUDE_CLIENT_CLIENT_HPP
 
+#include <QTcpSocket>
 #include <QObject>
-#include <string>
-#include <boost/asio.hpp>
-#include <boost/regex.hpp>
-#include <client/chatbox.hpp>
-#include <client/fakegoban.hpp>
+#include <QString>
 #include <net/object.hpp>
 #include <net/header.hpp>
+#include <net/factory.hpp>
 #include <net/history.hpp>
+#include <net/greeting.hpp>
 #include <history.hpp>
 #include <histlock.hpp>
 
@@ -33,26 +32,38 @@ class Client : public QObject {
 
     public slots:
 	void cl_connect();
+	void cl_disconnect();
+
 	void playStone(Position const& pos);
 	void message(QString const& str);
 	void undo();
 	void pass();
-	void disconnect();
+	void kill(Position const& pos);
+
+	void handleError(QAbstractSocket::SocketError);
+
+	void listen();
+
+	void writeLogToDisk(QString const& filename);
+	void exit();
 
     signals:
 	void display(QString const& str);
 	void placeStone(bool black, Position const& pos);
 	void removeStone(Position const& pos);
+	void setColourVal(bool black);
+	void setTurnVal(bool black);
+	void setKomiVal(double komi);
+	void setBlackCapsVal(int caps);
+	void setWhiteCapsVal(int caps);
+	void setConnectionVal(QString const& str);
+	void clear();
+	void closeWindow();
 
     private:
-	void sendMessage(std::string const& str);
-	void sendPlay(Position const& pos);
-	void sendPass();
-	void sendUndo();
+	void acceptGreeting(net::Greeting::Pointer ngrp);
 
-	void listen();
-
-	template<net::Header::Type T>
+	template<net::Header::HType T>
 	net::Object::Pointer expect();
 
 	void play(Move const& mv);
@@ -60,12 +71,15 @@ class Client : public QObject {
 
 	History hist_;
 	HistLock* hlock_;
+	net::Factory nfact_;
 
-	boost::asio::io_service io_;
-	boost::asio::ip::tcp::socket sock_;
-	std::string ip_;
-	std::string port_;
+	QTcpSocket* sock_;
+	QString host_;
+	int port_;
+
+	double komi_;
 	bool black_;
+	bool connected_;
 };
 
 }

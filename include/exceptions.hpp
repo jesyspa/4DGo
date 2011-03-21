@@ -2,13 +2,13 @@
 #define FDGO_INCLUDE_EXCEPTION_HPP
 
 #include <boost/exception/all.hpp>
-#include <string>
+#include <QString>
 #include <exception>
 
 namespace fdgo {
 
-typedef boost::error_info<struct tag_err_msg,std::string> err_msg;
-typedef boost::error_info<struct tag_type_err_msg,std::string> type_err_msg;
+typedef boost::error_info<struct tag_err_msg,QString> err_msg;
+typedef boost::error_info<struct tag_type_err_msg,QString> type_err_msg;
 
 
 //! \brief Base class for all exceptions that must terminate the program.

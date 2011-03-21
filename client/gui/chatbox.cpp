@@ -54,7 +54,7 @@ void Chatbox::inputValid(QString const& text) {
 }
 
 void Chatbox::display(QString const& str) {
-	tbCBox_->insertPlainText(str);
+	tbCBox_->append(str);
 }
 
 void Chatbox::submitInput() {
@@ -74,17 +74,29 @@ void Chatbox::parseString(QString str) {
 	QStringList list = str.split(QRegExp("\\s+"));
 	QStringList::const_iterator it = list.begin();
 	if (it->contains(rgxPos)) {
-		emit playStone(Position(it->toStdString()));
+		emit playStone(Position(*it));
 	} else if (*it == "pass") {
 		emit pass();
 	} else if (*it == "undo") {
 		emit undo();
+	} else if (*it == "kill") {
+		if (++it == list.end() || !it->contains(rgxPos))
+			tbCBox_->append("Expected position as second argument.");
+		else
+			emit kill(Position(*it));
 	} else if (*it == "exit") {
 		emit exit();
 	} else if (*it == "connect") {
 		emit cl_connect();
 	} else if (*it == "disconnect") {
-		emit disconnect();
+		emit cl_disconnect();
+	} else if (*it == "save") {
+		if (++it == list.end())
+			tbCBox_->append("Expected filename as second argument.");
+		else
+			emit writeLogToDisk(*it);
+	} else {
+		tbCBox_->append(QString("Unknown command: ")+*it);
 	}
 }
 

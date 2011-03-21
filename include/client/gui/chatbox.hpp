@@ -33,8 +33,10 @@ class Chatbox : public QWidget {
 	void playStone(Position const& pos);
 	void undo();
 	void pass();
+	void kill(Position const& pos);
 	void cl_connect();
-	void disconnect();
+	void cl_disconnect();
+	void writeLogToDisk(QString const& str);
 	void exit();
 
     private:

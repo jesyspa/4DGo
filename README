@@ -3,14 +3,15 @@ A four-dimensional goban.
 Currently implemented:
 - Playing of stones
 - Automatic removal of surrounded chains
-- Possibility to save
+- Possibility to save log
 - Undo
 - Server-client split
-
-Next goal:
 - Graphical client
+- Killing groups
 
 Needs doing:
-- Multithreading
+- Keeping track of prisoners
+- Asking confirmation for undo/kill
+- Kill on enemy turn
 - Counting score
 - Ko

@@ -68,23 +68,23 @@ Info::Info(QWidget* parent) : QWidget(parent) {
 }
 
 void Info::setColour(bool black) {
-	lblColourVal_->setText(black ? "Black" : "White");
+	lblColourVal_->setText(black ? tr("Black") : tr("White"));
 }
 
 void Info::setTurn(bool black) {
-	lblTurnVal_->setText(black ? "Black" : "White");
+	lblTurnVal_->setText(black ? tr("Black") : tr("White"));
 }
 
 void Info::setBlackCaps(int caps) {
-	lblWhiteCapsVal_->setText(boost::lexical_cast<std::string>(caps).c_str());
+	lblBlackCapsVal_->setNum(caps);
 }
 
 void Info::setWhiteCaps(int caps) {
-	lblWhiteCapsVal_->setText(boost::lexical_cast<std::string>(caps).c_str());
+	lblWhiteCapsVal_->setNum(caps);
 }
 
-void Info::setKomi(float komi) {
-	lblKomiVal_->setText(boost::lexical_cast<std::string>(komi).c_str());
+void Info::setKomi(double komi) {
+	lblKomiVal_->setNum(komi);
 }
 
 void Info::setConnection(QString const& str) {

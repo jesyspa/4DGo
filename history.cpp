@@ -1,5 +1,8 @@
-#include <iterator>
 #include <fstream>
+#include <QString>
+#include <QList>
+#include <QFile>
+#include <QTextStream>
 #include <history.hpp>
 #include <position.hpp>
 #include <move.hpp>
@@ -25,32 +28,60 @@ void History::pass(bool black) {
 	push(Move(black, Position(), Move::pass));
 }
 
+void History::kill(Position const& pos) {
+	push(Move(true, pos, Move::kill));
+}
+
 void History::addNull() {
 	push(Move(false, Position(), Move::none));
 }
 
-void History::writeToDisk(std::string filename) {
-	std::ofstream log(filename.c_str());
-	for (uint i = 0; i < mvec_.size(); ++i) {
-		log << mvec_[i].toString() << "\n";
+void History::writeToDisk(QString const& filename) {
+	QFile log(filename);
+	if (!log.open(QIODevice::WriteOnly | QIODevice::Text))
+	         return;
+	QTextStream out(&log);
+	for (int i = 0; i < mlist_.size(); ++i) {
+		out << mlist_[i].toString();
 	}
+	log.flush();
 }
 
-Move::MType History::lastMoveType() {
-	if (!mvec_.size()) 
-		return Move::none;
-	return mvec_.back().type;
+void History::undoLastMove() {
+	if (mlist_.empty()) 
+		return;
+	mlist_.pop_back(); // The null
+	while (!mlist_.empty() && mlist_.back().type == Move::remove) 
+		mlist_.pop_back(); // The removes
+	if (!mlist_.empty()) // The placement
+		mlist_.pop_back();
 }
 
-Move History::popLastMove() {
-	if (!mvec_.size())
+int History::seekLastTurn() {
+	for (int i = mlist_.size() - 1; i >= 0; --i) {
+		if (mlist_[i].type == Move::none)
+			return i;
+	}
+	return -1;
+}
+
+Move History::remove(int i) {
+	if (i >= mlist_.size() || i < 0)
 		return Move();
-	Move m = mvec_.back();
-	mvec_.pop_back();
-	return m;
+	Move tmp = mlist_[i];
+	mlist_.removeAt(i);
+	return tmp;
+}
+
+Move::MType History::getType(int i) {
+	if (i >= mlist_.size() || i < 0)
+		return Move::none;
+	return mlist_[i].type;
 }
 
 Move History::peekStack() {
+	if (mstack_.empty())
+		return Move();
 	return mstack_.top();
 }
 
@@ -59,7 +90,7 @@ bool History::unhandledMoves() {
 }
 
 void History::confirmTop() {
-	mvec_.push_back(mstack_.top());
+	mlist_.push_back(mstack_.top());
 	mstack_.pop();
 }
 
@@ -69,7 +100,7 @@ void History::push(Move const& mv) {
 	if (useStack_)
 		mstack_.push(mv);
 	else
-		mvec_.push_back(mv);
+		mlist_.push_back(mv);
 }
 
 }

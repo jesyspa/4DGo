@@ -87,14 +87,53 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent) {
 	connect(       cbox_, SIGNAL(pass()),
 	             client_, SLOT(  pass())
 	       );
+	connect(       cbox_, SIGNAL(exit()),
+	             client_, SLOT(  exit())
+	       );
 	connect(       cbox_, SIGNAL(cl_connect()),
 	             client_, SLOT(  cl_connect())
 	       );
-	connect(       cbox_, SIGNAL(disconnect()),
-	             client_, SLOT(  disconnect())
+	connect(       cbox_, SIGNAL(cl_disconnect()),
+	             client_, SLOT(  cl_disconnect())
+	       );
+	connect(       cbox_, SIGNAL(writeLogToDisk(QString const&)),
+	             client_, SLOT(  writeLogToDisk(QString const&))
+	       );
+	connect(       cbox_, SIGNAL(kill(Position const&)),
+	             client_, SLOT(  kill(Position const&))
 	       );
 	connect(     client_, SIGNAL(display(QString const&)),
 	               cbox_, SLOT(  display(QString const&))
+	       );
+	connect(     client_, SIGNAL(placeStone(bool, Position const&)),
+	              goban_, SLOT(  placeStone(bool, Position const&))
+	       );
+	connect(     client_, SIGNAL(removeStone(Position const&)),
+	              goban_, SLOT(  removeStone(Position const&))
+	       );
+	connect(     client_, SIGNAL(setColourVal(bool)),
+	               info_, SLOT(  setColour(bool))
+	       );
+	connect(     client_, SIGNAL(setTurnVal(bool)),
+	               info_, SLOT(  setTurn(bool))
+	       );
+	connect(     client_, SIGNAL(setKomiVal(double)),
+	               info_, SLOT(  setKomi(double))
+	       );
+	connect(     client_, SIGNAL(setBlackCapsVal(int)),
+	               info_, SLOT(  setBlackCaps(int))
+	       );
+	connect(     client_, SIGNAL(setWhiteCapsVal(int)),
+	               info_, SLOT(  setWhiteCaps(int))
+	       );
+	connect(     client_, SIGNAL(setConnectionVal(QString const&)),
+	               info_, SLOT(  setConnection(QString const&))
+	       );
+	connect(     client_, SIGNAL(clear()),
+	              goban_, SLOT(  clear())
+	       );
+	connect(     client_, SIGNAL(closeWindow()),
+	                qApp, SLOT(  closeAllWindows())
 	       );
 }
 

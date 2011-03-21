@@ -1,5 +1,5 @@
-#ifndef FDGO_INCLUDE_NET_GREETING_HPP
-#define FDGO_INCLUDE_NET_GREETING_HPP
+#ifndef FDGO_INCLUDE_NET_TURN_HPP
+#define FDGO_INCLUDE_NET_TURN_HPP
 
 #include <net/object.hpp>
 #include <net/header.hpp>
@@ -10,15 +10,14 @@ namespace net {
 //! \brief An object of this class is sent to the client to inform it of the
 //!        details of this game.
 
-class Greeting : public Object {
+class Turn : public Object {
     public:
-	typedef boost::shared_ptr<Greeting> Pointer;
+	typedef boost::shared_ptr<Turn> Pointer;
 
-	Greeting(); 
-	Greeting(double komi, bool black);
-	Greeting(Header const& header);
+	Turn(); 
+	Turn(bool black);
+	Turn(Header const& header);
 	
-	double komi;
 	bool black;
 
     protected:

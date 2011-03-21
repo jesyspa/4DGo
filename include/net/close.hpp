@@ -18,10 +18,9 @@ class CloseConnection : public Object {
 
 	CloseConnection(); 
 	CloseConnection(Header const& header);
-	void write(boost::asio::ip::tcp::socket& sock);
-
-    private:
-	void read(boost::asio::ip::tcp::socket& sock);
+    protected:
+	void printOn(QDataStream& ds) const;
+	void readFrom(QDataStream& ds);
 };
 
 }

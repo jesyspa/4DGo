@@ -1,11 +1,11 @@
 #ifndef FDGO_INCLUDE_NET_NULL_HPP
 #define FDGO_INCLUDE_NET_NULL_HPP
 
-#include <string>
-#include <vector>
-#include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
 #include <net/object.hpp>
 #include <net/header.hpp>
+
+class QDataStream;
 
 namespace fdgo {
 namespace net {
@@ -18,10 +18,10 @@ class Null : public Object {
 
 	Null(); 
 	Null(Header const& header);
-	void write(boost::asio::ip::tcp::socket& sock);
 
-    private:
-	void read(boost::asio::ip::tcp::socket& sock);
+    protected:
+	void printOn(QDataStream& ds) const;
+	void readFrom(QDataStream& ds);
 };
 
 }

@@ -1,11 +1,15 @@
 #ifndef FDGO_INCLUDE_SERVER_SERVER_HPP
 #define FDGO_INCLUDE_SERVER_SERVER_HPP
 
-#include <string>
-#include <boost/asio.hpp>
-#include <server/connection.hpp>
+#include <QObject>
+#include <QString>
 #include <server/goban.hpp>
+#include <net/object.hpp>
+#include <net/factory.hpp>
 #include <history.hpp>
+
+class QTcpSocket;
+class QTcpServer;
 
 namespace fdgo {
 
@@ -13,21 +17,23 @@ class Move;
 
 namespace server {
 
-class Server {
-    private:
-	// Should never be called.
-	Server(Server const&); 
-	Server& operator=(Server const&);
+class Server : public QObject {
+	Q_OBJECT
     public:
-	Server(int argc, char** argv); 
+	Server(QObject* parent = 0); 
 	~Server();
-	void awaitConnections();
-	void run();
-    private:
-	void listen();
 
-	void sendMessage(bool black, std::string const& str);
-	void broadcast(std::string const& str);
+    public slots:
+	void newConnection();
+	void listenBlack();
+	void listenWhite();
+
+    private:
+	void parse(bool black, net::Object::Pointer sock);
+
+	template<class T>
+	void broadcast(T const& t);
+	void broadcast(QString const& str);
 	void broadcast(Move const& mv);
 	void broadcastMoves();
 
@@ -39,16 +45,21 @@ class Server {
 	void enableHistory();
 	void popHistory();
 
-	boost::asio::io_service io_;
-	boost::asio::ip::tcp::acceptor* acceptor_;
-	Connection::Pointer bCon_;
-	Connection::Pointer wCon_;
+	void setTurn(bool black);
+
+	QTcpServer* srv_;
+	QTcpSocket* bSock_;
+	QTcpSocket* wSock_;
+
     	unsigned int port_;
 
 	History hist_;
 	Goban goban_;
 
-	bool black_;
+	net::Factory bnFact_;
+	net::Factory wnFact_;
+
+	bool blackTurn_;
 };
 
 }

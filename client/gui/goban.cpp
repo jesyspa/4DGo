@@ -46,7 +46,7 @@ Goban::Goban(QWidget* parent) : QWidget(parent) {
 }
 
 void Goban::placeStone(bool black, Position const& pos) {
-	setIcon(pos[0], pos[1], pos[2], pos[3], black ? 'X' : 'W');
+	setIcon(pos[0], pos[1], pos[2], pos[3], black ? 'X' : 'O');
 }
 
 void Goban::removeStone(Position const& pos) {

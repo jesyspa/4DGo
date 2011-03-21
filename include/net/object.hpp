@@ -1,10 +1,12 @@
 #ifndef FDGO_INCLUDE_NET_OBJECT_HPP
 #define FDGO_INCLUDE_NET_OBJECT_HPP
 
-#include <boost/asio.hpp>
+#include <QDataStream>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <net/header.hpp>
+
+class QTcpSocket;
 
 namespace fdgo {
 namespace net {
@@ -12,27 +14,25 @@ namespace net {
 //! \brief Base class for sending and receiving objects.
 
 class Object : public boost::enable_shared_from_this<Object> {
+	friend class Factory;
     public:
 	typedef boost::shared_ptr<Object> Pointer;
 
 	Object(); 
 	Object(Header const& header);
 
-	//! Listen for an incoming object, figure out it's type, and create
-	//! something appropriate, returning a shared pointer to it.
-	static Pointer makeFromIncoming(boost::asio::ip::tcp::socket& sock);
+	void write(QTcpSocket* sock) const;
+	// No need for a read() -- the factory handles this.
 
-	//! Writes the object, including the header, over the socket.
-	virtual void write(boost::asio::ip::tcp::socket& sock) = 0;
-	Header::Type getType() const;
-
+	Header::HType getType() const;
     protected:
-	//! Reads the object, not counting the header, over the socket. The
-	//! header does not need to be read, because it has already been read
-	//! in order to decide the type.
-	virtual void read(boost::asio::ip::tcp::socket& sock) = 0;
-	virtual void checkError(boost::system::error_code error, size_t len);
+	virtual void printOn(QDataStream& ds) const = 0;
+	virtual void readFrom(QDataStream& ds) = 0;
 	Header header_;
+
+    private:
+	friend QDataStream& operator<<(QDataStream& ds, Object const& no);
+	friend QDataStream& operator>>(QDataStream& ds, Object& no);
 };
 
 }

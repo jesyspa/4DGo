@@ -27,7 +27,10 @@ void Goban::placeStone(bool black, Position const& pos) {
 }
 
 void Goban::killGroup(Position const& pos) {
-	BOOST_THROW_EXCEPTION(ExcNotImplemented());
+	Intersection* wrkIntr = getIntersection(pos);
+	if (wrkIntr->stone_)
+		if (wrkIntr->stone_->chain_)
+			wrkIntr->stone_->chain_->die();
 }
 
 void Goban::removeStone(Position const& pos) {

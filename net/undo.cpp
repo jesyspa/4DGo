@@ -7,20 +7,19 @@ namespace fdgo {
 namespace net {
 
 Undo::Undo() {
-	header_.setType(Header::Undo);
-	header_.setLength(0);
+	header_.type = Header::Undo;
 }
 
 Undo::Undo(Header const& header) : Object(header) {
-	if (header_.getType() != Header::Undo)
+	if (header_.type != Header::Undo)
 		BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
 }
 
-void Undo::write(tcp::socket& sock) {
-	header_.write(sock);
+
+void Undo::printOn(QDataStream&) const {
 }
 
-void Undo::read(tcp::socket&) {
+void Undo::readFrom(QDataStream&) {
 }
 
 }

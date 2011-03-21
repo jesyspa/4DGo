@@ -1,8 +1,7 @@
 #ifndef FDGO_INCLUDE_SERVER_CHAIN_HPP
 #define FDGO_INCLUDE_SERVER_CHAIN_HPP
 
-#include <vector>
-#include <boost/shared_ptr.hpp>
+#include <QVector>
 namespace fdgo {
 namespace server {
 
@@ -18,19 +17,19 @@ class Chain {
 	// Should never be called.
 	Chain(Chain const&);
 	Chain& operator=(Chain const&);
+	// Should only be called internally
+	~Chain();
     public:
-	typedef boost::shared_ptr<Chain> Pointer;
-
 	Chain(Stone* st); // Create a chain from one stone.
 	void addStone(Stone* st);
 	void removeStone(Stone* st);
-	void joinWith(Chain::Pointer ch);
+	void joinWith(Chain* ch);
 	void considerDying(bool forbid = false); // DANGER! May cause object to poof!
 	void die();
     private:
 	bool checkLiberties();
 	bool const black_;
-	std::vector<Stone*> stonevec_;
+	QList<Stone*> stoneli_;
 };
 
 }

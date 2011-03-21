@@ -1,4 +1,4 @@
-#include <vector>
+#include <QList>
 #include <server/stone.hpp>
 #include <server/goban.hpp>
 #include <server/intersection.hpp>
@@ -8,7 +8,7 @@
 namespace fdgo {
 namespace server {
 
-Stone::Stone(Intersection* intrPtr, bool black) : intrPtr_(intrPtr), libs(8), black_(black) {
+Stone::Stone(Intersection* intrPtr, bool black) : chain_(0), intrPtr_(intrPtr), libs(8), black_(black) {
 	connectToNeighbours();
 	seeIfAnyoneIsDead();
 }
@@ -32,7 +32,7 @@ void Stone::connectToNeighbours() {
 	connectTo(intrPtr_->nbr_->farleft);
 	connectTo(intrPtr_->nbr_->farright);
 	if (!chain_)
-		chain_.reset(new Chain(this));
+		chain_ = new Chain(this);
 }
 
 void Stone::connectTo(Intersection* p) {
@@ -41,7 +41,7 @@ void Stone::connectTo(Intersection* p) {
 	if (chain_) {
 		if (chain_ == p->stone_->chain_)
 			return;
-		p->stone_->chain_->joinWith(chain_);
+		chain_->joinWith(p->stone_->chain_);
 	} else {
 		p->stone_->chain_->addStone(this);
 	}
@@ -80,7 +80,7 @@ void Stone::giveLiberty(Intersection* p) {
 }
 
 void Stone::seeIfAnyoneIsDead() {
-	std::vector<Chain::Pointer> enemyChains;
+	QList<Chain*> enemyChains;
 	getChain(enemyChains, intrPtr_->nbr_->up);
 	getChain(enemyChains, intrPtr_->nbr_->down);
 	getChain(enemyChains, intrPtr_->nbr_->left);
@@ -89,19 +89,19 @@ void Stone::seeIfAnyoneIsDead() {
 	getChain(enemyChains, intrPtr_->nbr_->fardown);
 	getChain(enemyChains, intrPtr_->nbr_->farleft);
 	getChain(enemyChains, intrPtr_->nbr_->farright);
-	for (uint i = 0; i < enemyChains.size(); ++i)
+	for (int i = 0; i < enemyChains.size(); ++i)
 		enemyChains[i]->considerDying();
 	chain_->considerDying(true);
 }
 
-void Stone::getChain(std::vector<Chain::Pointer>& chvec, Intersection* p) {
+void Stone::getChain(QList<Chain*>& chvec, Intersection* p) {
 	if (!p)
 		return;
 	if (!p->stone_)
 		return;
 	if (p->stone_->black_ == black_)
 		return;
-	for (uint i = 0; i < chvec.size(); ++i)
+	for (int i = 0; i < chvec.size(); ++i)
 		if (p->stone_->chain_ == chvec[i])
 			return;
 	chvec.push_back(p->stone_->chain_);

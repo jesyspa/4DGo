@@ -1,10 +1,9 @@
 #ifndef FDGO_INCLUDE_MEMORY_HPP
 #define FDGO_INCLUDE_MEMORY_HPP
 
-#include <vector>
-#include <string>
-#include <stack>
 #include <boost/shared_ptr.hpp>
+#include <QList>
+#include <QStack>
 #include <move.hpp>
 
 namespace fdgo {
@@ -26,21 +25,24 @@ class History {
 	void placeStone(bool black, Position const& pos);
 	void removeStone(bool black, Position const& pos);
 	void pass(bool black);
+	void kill(Position const& pos);
 	void addNull();
-	Move::MType lastMoveType();
-	Move popLastMove();
+	void undoLastMove();
+	int seekLastTurn();
+	Move remove(int i);
+	Move::MType getType(int i);
 
 	Move peekStack();
 	bool unhandledMoves();
 	void confirmTop();
 
-	void writeToDisk(std::string filename);
+	void writeToDisk(QString const& filename);
     private:
 	void push(Move const& mv);
 	int locked_;
 	bool useStack_;
-	std::vector<Move> mvec_;
-	std::stack<Move> mstack_;
+	QList<Move> mlist_;
+	QStack<Move> mstack_;
 };
 
 }

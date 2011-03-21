@@ -19,13 +19,13 @@ int main(int argc, char** argv) {
 	catch (boost::exception& e) {
 		std::cerr << "An exception has been caught." << std::endl;
 
-		if (std::string const* ti = boost::get_error_info<type_err_msg>(e))
-			std::cerr << "Error type info: " << *ti << std::endl;
+		if (QString const* ti = boost::get_error_info<type_err_msg>(e))
+			std::cerr << "Error type info: " << ti->toStdString() << std::endl;
 		else
 			std::cerr << "No error type info provided." << std::endl;
 
-		if (std::string const* msg = boost::get_error_info<err_msg>(e))
-			std::cerr << "Error message: " << *msg << std::endl;
+		if (QString const* msg = boost::get_error_info<err_msg>(e))
+			std::cerr << "Error message: " << msg->toStdString() << std::endl;
 		else
 			std::cerr << "No error message provided." << std::endl;
 
