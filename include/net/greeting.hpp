@@ -7,11 +7,12 @@
 namespace fdgo {
 namespace net {
 
-//! \brief An object of this class is sent to the client to inform it of the
-//!        details of this game.
+//! \brief Message that is sent when game starts.
+//! 
+//! Might want to have it inherit from Message, to add a MOTD.
 
 class Greeting : public Object {
-    public:
+  public:
 	typedef boost::shared_ptr<Greeting> Pointer;
 
 	Greeting(); 
@@ -21,7 +22,7 @@ class Greeting : public Object {
 	double komi;
 	bool black;
 
-    protected:
+  protected:
 	void printOn(QDataStream& ds) const;
 	void readFrom(QDataStream& ds);
 };

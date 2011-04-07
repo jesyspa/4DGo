@@ -10,10 +10,13 @@ class QDataStream;
 namespace fdgo {
 namespace net {
 
-//! \brief Class for sending and receiving messages.
+//! \brief Message for chat messages.
+//!
+//! Perhaps calling instances of the net:: classes `messages' was not a good
+//! idea.
 
 class Message : public Object {
-    public:
+  public:
 	typedef boost::shared_ptr<Message> Pointer;
 
 	Message(); 
@@ -22,7 +25,7 @@ class Message : public Object {
 
 	QString msg;
 
-    protected:
+  protected:
 	void printOn(QDataStream& ds) const;
 	void readFrom(QDataStream& ds);
 };

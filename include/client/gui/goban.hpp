@@ -14,17 +14,24 @@ namespace gui {
 
 class GobanSlice;
 
+//! \brief Handles the display of the 4x4x4x4 supergoban.
+//!
+//! For easier use, instead of having it interact directly with individual
+//! intersections, this class contains 16 4x4 gobans. (This also allows for
+//! simpler use of QGridLayout.)
+
 class Goban : public QWidget {
 	Q_OBJECT
-    public:
+  public:
 	Goban(QWidget* parent = 0);
 
-    public slots:
+  public slots:
 	void placeStone(bool black, Position const& pos);
 	void removeStone(Position const& pos);
 	void clear();
+	void clearHighlight();
 
-    private:
+  private:
 	void setIcon(size_t a, size_t b, size_t c, size_t d, char icon);
 
 	QGridLayout* glMain_;

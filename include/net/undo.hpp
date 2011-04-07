@@ -3,23 +3,24 @@
 
 #include <string>
 #include <vector>
-#include <boost/asio.hpp>
 #include <net/object.hpp>
 #include <net/header.hpp>
 
 namespace fdgo {
 namespace net {
 
-//! \brief Base class for sending and receiving messages.
+//! \brief Message that is sent to request an undo.
+//!
+//! Should inherit net::Null.
 
 class Undo : public Object {
-    public:
+  public:
 	typedef boost::shared_ptr<Undo> Pointer;
 
 	Undo(); 
 	Undo(Header const& header);
 
-    protected:
+  protected:
 	void printOn(QDataStream& ds) const;
 	void readFrom(QDataStream& ds);
 };

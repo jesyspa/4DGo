@@ -26,11 +26,11 @@ namespace client {
 
 class Client : public QObject {
 	Q_OBJECT
-    public:
+  public:
 	Client(QObject* parent = 0); 
 	~Client();
 
-    public slots:
+  public slots:
 	void setHost(QString const& str);
 	void setPort(int p);
 	void cl_connect();
@@ -41,6 +41,7 @@ class Client : public QObject {
 	void undo();
 	void pass();
 	void kill(Position const& pos);
+	void confirm(bool give);
 
 	void handleError(QAbstractSocket::SocketError);
 
@@ -49,7 +50,7 @@ class Client : public QObject {
 	void writeLogToDisk(QString const& filename);
 	void exit();
 
-    signals:
+  signals:
 	void display(QString const& str);
 	void placeStone(bool black, Position const& pos);
 	void removeStone(Position const& pos);
@@ -62,7 +63,7 @@ class Client : public QObject {
 	void clear();
 	void closeWindow();
 
-    private:
+  private:
 	void acceptGreeting(net::Greeting::Pointer ngrp);
 
 	template<net::Header::HType T>

@@ -2,8 +2,6 @@
 #include <net/error.hpp>
 #include <exceptions.hpp>
 
-using boost::asio::ip::tcp;
-
 namespace fdgo {
 namespace net {
 

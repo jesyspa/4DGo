@@ -9,7 +9,7 @@ namespace fdgo {
 //! \brief Contains a full description of a single move.
 
 class Move {
-    public:
+  public:
 	enum MType {
 		none,
 		pass,

@@ -12,6 +12,8 @@
 #include <net/undo.hpp>
 #include <net/turn.hpp>
 #include <net/history.hpp>
+#include <net/setting.hpp>
+#include <net/confirm.hpp>
 #include <net/close.hpp>
 
 #endif // Guard

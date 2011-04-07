@@ -2,6 +2,7 @@
 #define FDGO_INCLUDE_SERVER_SERVER_HPP
 
 #include <QObject>
+#include <QQueue>
 #include <QString>
 #include <server/goban.hpp>
 #include <net/object.hpp>
@@ -17,6 +18,10 @@ class Move;
 
 namespace server {
 
+//! Application class for server side. 
+//!
+//! Needs to be reworked and split up. Currently 
+
 class Server : public QObject {
 	Q_OBJECT
     public:
@@ -29,18 +34,25 @@ class Server : public QObject {
 	void listenWhite();
 
     private:
+	// Make the following two one function and have a bool passed to
+	// tell them apart? 
 	void parse(bool black, net::Object::Pointer sock);
+	void confirmedParse(bool black, net::Object::Pointer sock);
 
+	// For sending things to players.
+	void message(bool black, QString const& str);
 	template<class T>
 	void broadcast(T const& t);
 	void broadcast(QString const& str);
 	void broadcast(Move const& mv);
 	void broadcastMoves();
 
+	// For interacting with the goban.
+	// Hm, seems like too few -- where's killGroup()? Not good.
 	void tryPlay(Move const& mv);
+	void undo(bool black);
 
-	void undo();
-
+	// For interacting with the history.
 	void disableHistory();
 	void enableHistory();
 	void popHistory();
@@ -51,10 +63,15 @@ class Server : public QObject {
 	QTcpSocket* bSock_;
 	QTcpSocket* wSock_;
 
-    	unsigned int port_;
+	unsigned int port_;
 
 	History hist_;
 	Goban goban_;
+
+	double komi_;
+
+	QQueue<net::Object::Pointer> brQueue_;
+	QQueue<net::Object::Pointer> wrQueue_;
 
 	net::Factory bnFact_;
 	net::Factory wnFact_;

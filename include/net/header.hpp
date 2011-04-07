@@ -1,33 +1,35 @@
 #ifndef FDGO_INCLUDE_NET_HEADER_HPP
 #define FDGO_INCLUDE_NET_HEADER_HPP
 
-#include <cstdint>
-#include <boost/array.hpp>
-#include <boost/asio.hpp>
 #include <exceptions.hpp>
+
+class QDataStream;
 
 namespace fdgo {
 namespace net {
 
-//! \brief Header for everything sent.
+//! \brief Header for all messages sent.
 //!
 //! Current layout:\n
 //! qint32 type\n
 //! quint16 length\n
 //! Total used: 6 bytes\n
 class Header {
-    public:
-    	static const quint16 hsize = sizeof(qint32) + sizeof(quint16);
+  public:
+ 	static const quint16 hsize = sizeof(qint32) + sizeof(quint16);
 	static const quint16 sizeStart = 4;
 	enum HType {
 		Null,
 		Error,
-		Greeting, // Server sends this to the player to inform him of his colour, etc.
+		Greeting, 
 		Message,
 		Move,
 		Undo,
 		Turn,
-		History, // Popping, disabling, and enabling history.
+		History, 
+		Setting,
+		Score,
+		Confirmation,
 		CloseConnection
 	} type;
 

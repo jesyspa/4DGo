@@ -10,16 +10,18 @@ class Goban;
 struct Score;
 
 //! \brief Handles all input and output from the user.
+//!
+//! \deprecated
 
 class IO {
 	// Explicitly forbidden
 	IO(IO const&);
 	IO& operator=(IO const&);
-    public:
+  public:
 	IO(int argc, char** argv);
 	~IO();
 	void giveControl();
-    private:
+  private:
 	void mainLoop();
 	void showScore(Score const& sc);
 	void redraw();

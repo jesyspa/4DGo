@@ -17,9 +17,6 @@ Client::Client(QObject* parent) : QObject(parent), hist_(false), hlock_(0), blac
 	host_ = "localhost";
 	port_ = 15493;
 	sock_ = new QTcpSocket(this);
-	connect(       sock_, SIGNAL(readyRead()),
-	                this, SLOT(  listen())
-	       );
 	connect(       sock_, SIGNAL(error(QAbstractSocket::SocketError)),
 	                this, SLOT(  handleError(QAbstractSocket::SocketError))
 	       );
@@ -82,9 +79,6 @@ void Client::cl_disconnect() {
 	disconnect(    sock_, SIGNAL(readyRead()),
 	                this, SLOT(  listen())
 	       );
-	disconnect(    sock_, SIGNAL(error(QAbstractSocket::SocketError)),
-	                this, SLOT(  handleError(QAbstractSocket::SocketError))
-	       );
 	emit display("Succesfully disconnected.");
 }
 
@@ -114,6 +108,11 @@ void Client::kill(Position const& pos) {
 	Move mv(black_, pos, Move::kill);
 	net::Move nmv(mv);
 	nmv.write(sock_);
+}
+
+void Client::confirm(bool give) {
+	net::Confirmation ncf(give);
+	ncf.write(sock_);
 }
 
 void Client::listen() {

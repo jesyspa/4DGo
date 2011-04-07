@@ -1,5 +1,5 @@
-#ifndef FDGO_INCLUDE_MEMORY_HPP
-#define FDGO_INCLUDE_MEMORY_HPP
+#ifndef FDGO_INCLUDE_HISTORY_HPP
+#define FDGO_INCLUDE_HISTORY_HPP
 
 #include <boost/shared_ptr.hpp>
 #include <QList>
@@ -8,17 +8,15 @@
 
 namespace fdgo {
 
-class MemLock;
-
 //! \brief Stores the moves made.
 
 class History {
 	friend class HistLock;
-    private:
+  private:
 	// Should never be called.
 	History(History const&); 
 	History& operator=(History const&);
-    public:
+  public:
 	typedef boost::shared_ptr<History> Pointer;
 	History(bool useStack = true); 
 	~History();
@@ -38,7 +36,7 @@ class History {
 	void confirmTop();
 
 	void writeToDisk(QString const& filename);
-    private:
+  private:
 	void push(Move const& mv);
 	int locked_;
 	bool useStack_;

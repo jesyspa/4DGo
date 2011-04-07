@@ -10,16 +10,19 @@ class QDataStream;
 namespace fdgo {
 namespace net {
 
-//! \brief Base class for sending and receiving messages.
+//! \brief Message used for not sending anything.
+//!
+//! Should be inherited by everything that only changes the type, and carries
+//! no information, such as CloseConnection.
 
 class Null : public Object {
-    public:
+  public:
 	typedef boost::shared_ptr<Null> Pointer;
 
 	Null(); 
 	Null(Header const& header);
 
-    protected:
+  protected:
 	void printOn(QDataStream& ds) const;
 	void readFrom(QDataStream& ds);
 };

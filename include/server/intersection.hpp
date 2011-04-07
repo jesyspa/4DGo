@@ -16,12 +16,13 @@ class Stone;
 
 class Intersection {
 	friend class Stone;
+	friend class ScoreStone;
 	friend class Goban;
 	
 	// Explicitly forbidden
 	Intersection(Intersection const&);
 	Intersection& operator=(Intersection const&);
-    public:
+  public:
 	Intersection();
 	~Intersection();
 
@@ -30,7 +31,7 @@ class Intersection {
 	char getIcon();
 	bool needNeighbours();
 	void giveNeighbours(const Neighbours::Pointer nbr);
-    private:
+  private:
 	Goban* goban_;
 	Stone* stone_;
 	Neighbours::Pointer nbr_;

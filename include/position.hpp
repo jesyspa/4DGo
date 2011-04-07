@@ -66,9 +66,8 @@ struct Position {
 		return s;
 	}
 
-    private:
+  private:
 	boost::array<quint32,4> arr_;
-	static const QRegExp validPos_;
 };
 
 }

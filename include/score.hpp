@@ -4,9 +4,9 @@
 namespace fdgo {
 
 struct Score {
-	Score();
+	Score() : black(0), white(0), komi(0.5) {}
 	unsigned int black, white;
-	bool blackVictory;
+	double komi;
 };
 
 }

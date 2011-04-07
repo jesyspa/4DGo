@@ -10,10 +10,13 @@ class QDataStream;
 namespace fdgo {
 namespace net {
 
-//! \brief Base class for sending and receiving errors.
+//! \brief Message sent to denote an error.
+//!
+//! Contains the type and an error message. Should probably inherit from
+//! net::Message.
 
 class Error : public Object {
-    public:
+  public:
 	typedef boost::shared_ptr<Error> Pointer;
 
 	enum EType {
@@ -31,7 +34,7 @@ class Error : public Object {
 
 	QString msg;
 
-    protected:
+  protected:
 	void printOn(QDataStream& ds) const;
 	void readFrom(QDataStream& ds);
 };

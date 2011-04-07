@@ -5,6 +5,7 @@
 #include <history.hpp>
 #include <histlock.hpp>
 #include <move.hpp>
+#include <score.hpp>
 #include <exceptions.hpp>
 
 namespace fdgo {
@@ -52,7 +53,37 @@ void Goban::noteStoneRemoval(Intersection* itr, bool black) {
 }
 
 Score Goban::makeScore() {
-	BOOST_THROW_EXCEPTION(ExcNotImplemented());
+	Score sc;
+	Intersection* intr;
+	for (size_t a = 0; a < 4; ++a) {
+		for (size_t b = 0; b < 4; ++b) {
+			for (size_t c = 0; c < 4; ++c) {
+				for (size_t d = 0; d < 4; ++d) {
+					Position pos(a,b,c,d);
+					intr = getIntersection(pos);
+					if (intr->needNeighbours())
+						intr->giveNeighbours(makeNeighbours(pos));
+				}
+			}
+		}
+	}
+	for (size_t i = 0; i < 4*4*4*4; ++i) {
+		if (intrArr_[i].stone_)
+			intrArr_[i].stone_->libs = 13; // Makes the stone immortal.
+	}
+	for (size_t i = 0; i < 4*4*4*4; ++i) {
+		if (intrArr_[i].stone_)
+			intrArr_[i].stone_->spawnMore(); // Adds more stones around existing ones.
+	}
+	for (size_t i = 0; i < 4*4*4*4; ++i) {
+		if (!intrArr_[i].stone_)
+			continue;
+		if (intrArr_[i].stone_->black_)
+			sc.black++;
+		else
+			sc.white++;
+	}
+	return sc;
 }
 
 Intersection* Goban::getIntersection(Position const& pos) {

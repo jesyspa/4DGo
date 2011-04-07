@@ -21,12 +21,21 @@ GobanSlice::GobanSlice(QWidget* parent) : QFrame(parent) {
 
 void GobanSlice::setIcon(size_t c, size_t d, char icon) {
 	grid_[c][d]->setText(QChar(icon));
+	grid_[c][d]->setFrameStyle(QFrame::Box);
 }
 
 void GobanSlice::clear() {
 	for (size_t c = 0; c < 4; ++c) {
 		for (size_t d = 0; d < 4; ++d) {
 			grid_[c][d]->setText(".");
+		}
+	}
+}
+
+void GobanSlice::clearHighlight() {
+	for (size_t c = 0; c < 4; ++c) {
+		for (size_t d = 0; d < 4; ++d) {
+			grid_[c][d]->setFrameStyle(QFrame::NoFrame);
 		}
 	}
 }

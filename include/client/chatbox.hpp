@@ -8,18 +8,20 @@ namespace fdgo {
 namespace client {
 
 //! \brief Box where warnings and player messages appear.
+//!
+//! \deprecated
 
 class Chatbox {
-    private:
+  private:
 	// Should never be called.
 	Chatbox(Chatbox const&); 
 	Chatbox& operator=(Chatbox const&);
-    public:
+  public:
 	Chatbox();
 	void addMessage(std::string const& str);
 	void clear();
 	void draw();
-    private:
+  private:
 	std::deque<std::string> messages_;
 };
 

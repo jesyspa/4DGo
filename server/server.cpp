@@ -17,6 +17,7 @@ namespace server {
 
 Server::Server(QObject* parent) : QObject(parent), goban_(hist_), blackTurn_(true) {
 #if 0
+	// Old argument parsing logic. Might be a good idea to put some of it back.
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "show help message")
@@ -105,6 +106,7 @@ void Server::listenWhite() {
 		listenWhite();
 }
 
+// Perhaps find some cunning use of templates to aoid this mess? 
 void Server::parse(bool black, net::Object::Pointer nobp) {
 	try {
 		if(nobp->getType() == net::Header::Null) {
@@ -119,16 +121,30 @@ void Server::parse(bool black, net::Object::Pointer nobp) {
 			nmsgp->msg.prepend(black ? "Black: " : "White: ");
 			broadcast(*nmsgp);
 		} else if(nobp->getType() == net::Header::Move) {
-			if (black != blackTurn_)
-				return;
 			net::Move::Pointer nmvp;
 			nmvp = boost::dynamic_pointer_cast<net::Move>(nobp);
+			if (nmvp->mv.type == Move::kill) {
+				message(!black, QString("Opponent wishes to kill ") + nmvp->mv.pos.toString() + ". Grant?");
+				(black ? brQueue_ : wrQueue_).enqueue(nobp);
+			}
+			if (black != blackTurn_)
+				BOOST_THROW_EXCEPTION(ExcInvalidMove() << err_msg("It is not your turn."));
 			tryPlay(nmvp->mv);
 		} else if(nobp->getType() == net::Header::Undo ) {
-			broadcast(QString(black ? "Black" : "White") + " has requested an undo.");
-			undo();
-		} else if(nobp->getType() == net::Header::History) {
-			BOOST_THROW_EXCEPTION(ExcNotImplemented());
+			(black ? brQueue_ : wrQueue_).enqueue(nobp);
+			message(!black, "Opponent requested undo. Grant?");
+		} else if(nobp->getType() == net::Header::Confirmation) {
+			net::Confirmation::Pointer ncfp;
+			ncfp = boost::dynamic_pointer_cast<net::Confirmation>(nobp);
+			if ((black ? wrQueue_ : brQueue_).empty()) {
+				message(black, "Nothing to confirm.");
+				return;
+			}
+			if (ncfp->given) {
+				confirmedParse(!black, (black ? wrQueue_ : brQueue_).dequeue());
+			} else {
+				(black ? wrQueue_ : brQueue_).dequeue();
+			}
 		} else if(nobp->getType() == net::Header::CloseConnection) {
 			net::CloseConnection ncc;
 			ncc.write(bSock_);
@@ -167,6 +183,45 @@ void Server::parse(bool black, net::Object::Pointer nobp) {
 		#endif
 	}
 	broadcastMoves();
+}
+
+void Server::confirmedParse(bool black, net::Object::Pointer nobp) {
+	try {
+		if(nobp->getType() == net::Header::Move) {
+			// We can be sure this is a Move::kill
+			net::Move::Pointer nmvp;
+			nmvp = boost::dynamic_pointer_cast<net::Move>(nobp);
+			tryPlay(nmvp->mv);
+		} else if(nobp->getType() == net::Header::Undo ) {
+			undo(black);
+		} else {
+			BOOST_THROW_EXCEPTION(ExcIncorrectNetObjectType());
+		}
+	}
+	catch (ExcNonFatal& e) {
+		std::cerr << "A non-fatal exception has been caught when executing a confirmed move from " << (black ? "black" : "white") << "." << std::endl;
+
+		if (QString const* ti = boost::get_error_info<type_err_msg>(e))
+			std::cerr << "Error type info: " << ti->toStdString() << std::endl;
+		else
+			std::cerr << "No error type info provided." << std::endl;
+
+		if (QString const* msg = boost::get_error_info<err_msg>(e))
+			std::cerr << "Error message: " << msg->toStdString() << std::endl;
+		else
+			std::cerr << "No error message provided." << std::endl;
+
+		#ifndef NDEBUG
+			std::cerr << "\nDiagnostics info:\n";
+			std::cerr << boost::diagnostic_information(e);
+		#endif
+	}
+	broadcastMoves();
+}
+
+void Server::message(bool black, QString const& str) {
+	net::Message nmsg(str);
+	nmsg.write((black ? bSock_ : wSock_));
 }
 
 template<class T>
@@ -220,35 +275,37 @@ void Server::tryPlay(Move const& mv) {
 	}
 }
 
-void Server::undo() {
+void Server::undo(bool black) {
 	HistLock bHlock(&hist_, bSock_);
 	HistLock wHlock(&hist_, wSock_);
-	net::History nhi(net::History::pop);
-	broadcast(nhi);
-	Move lastmove;
-	size_t i = hist_.seekLastTurn();
-	hist_.remove(i); // Get rid of the null
-	lastmove = hist_.remove(i);
-	if (lastmove.type == Move::play) {
-		broadcast(net::Message("Move undone."));
-		setTurn(!blackTurn_);
-		goban_.removeStone(lastmove.pos);
-		broadcast(Move(lastmove.black, lastmove.pos, Move::remove));
-	} else if (lastmove.type == Move::kill) {
-		broadcast(net::Message("Kill undone."));
-	} else if (lastmove.type == Move::pass) {
-		broadcast(net::Message("Pass undone."));
-		setTurn(!blackTurn_);
-		return;
-	} else {
-		broadcast(net::Message("No move to undo."));
-		return;
-	}
-	while (hist_.getType(i) == Move::remove) {
+	do {
+		net::History nhi(net::History::pop);
+		broadcast(nhi);
+		Move lastmove;
+		size_t i = hist_.seekLastTurn();
+		hist_.remove(i); // Get rid of the null
 		lastmove = hist_.remove(i);
-		goban_.placeStone(lastmove.black, lastmove.pos);
-		broadcast(Move(lastmove.black, lastmove.pos, Move::play));
-	}
+		if (lastmove.type == Move::play) {
+			broadcast(net::Message("Move undone."));
+			setTurn(!blackTurn_);
+			goban_.removeStone(lastmove.pos);
+			broadcast(Move(lastmove.black, lastmove.pos, Move::remove));
+		} else if (lastmove.type == Move::kill) {
+			broadcast(net::Message("Kill undone."));
+		} else if (lastmove.type == Move::pass) {
+			broadcast(net::Message("Pass undone."));
+			setTurn(!blackTurn_);
+			continue;
+		} else {
+			broadcast(net::Message("No move to undo."));
+			return;
+		}
+		while (hist_.getType(i) == Move::remove) {
+			lastmove = hist_.remove(i);
+			goban_.placeStone(lastmove.black, lastmove.pos);
+			broadcast(Move(lastmove.black, lastmove.pos, Move::play));
+		}
+	} while (blackTurn_ != black);
 }
 
 void Server::setTurn(bool black) {

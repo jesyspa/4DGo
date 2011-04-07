@@ -14,19 +14,23 @@ namespace fdgo {
 namespace client {
 namespace gui {
 
+//! \brief Controls the text I/O.
+//!
+//! Adding another layer between this and the server may be a good idea.
+
 class Chatbox : public QWidget {
 	Q_OBJECT
-    public:
+  public:
 	Chatbox(QWidget* parent = 0);
 
-    public slots:
+  public slots:
 	void inputValid(QString const& text);
 	void display(QString const& str);
 
-    private slots:
+  private slots:
 	void submitInput();
 
-    signals:
+  signals:
 	void setSubmit(bool);
 
 	void message(QString const& str);
@@ -34,6 +38,7 @@ class Chatbox : public QWidget {
 	void undo();
 	void pass();
 	void kill(Position const& pos);
+	void confirm(bool give);
 	void setHost(QString const& str);
 	void setPort(int p);
 	void cl_connect();
@@ -41,7 +46,7 @@ class Chatbox : public QWidget {
 	void writeLogToDisk(QString const& str);
 	void exit();
 
-    private:
+  private:
 	void parseString(QString str);
 
 	QVBoxLayout* vlMain_;

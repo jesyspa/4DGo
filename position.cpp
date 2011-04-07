@@ -5,22 +5,13 @@
 
 namespace fdgo {
 
-const QRegExp Position::validPos_("^[A-D][1-4][a-d][1-4]$");
-
 Position::Position() {
 	for (int a = 0; a < 4; ++a)
 		arr_[a] = 0;
 }
 
 Position::Position(QString const& str) {
-	#ifndef NDEBUG
-	// Check for illegal string. Should be done elsewhere already, so only
-	// doing it when debugging.
-	if (!str.contains(validPos_)) {
-		BOOST_THROW_EXCEPTION(ExcInvalidPos()); 
-	}
-	#endif
-	arr_[0] = str.toAscii()[0] - 'A';
+	arr_[0] = str.toAscii()[0] - 'a';
 	arr_[1] = str.toAscii()[1] - '1';
 	arr_[2] = str.toAscii()[2] - 'a';
 	arr_[3] = str.toAscii()[3] - '1';

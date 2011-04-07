@@ -8,7 +8,7 @@ namespace fdgo {
 namespace client {
 namespace gui {
 
-const QRegExp Chatbox::rgxPos("^[A-D][1-4][a-d][1-4]$");
+const QRegExp Chatbox::rgxPos("^[a-d][1-4][a-d][1-4]$");
 
 Chatbox::Chatbox (QWidget* parent) : QWidget(parent) {
         vlMain_ = new QVBoxLayout(this);
@@ -47,6 +47,9 @@ Chatbox::Chatbox (QWidget* parent) : QWidget(parent) {
 	connect(leInputLine_, SIGNAL(returnPressed()),
 	                this, SLOT(  submitInput())
 	       );
+	display(tr("Welcome to 4DGo"));
+	display(tr("Enter !help or !h for more information."));
+	display("");
 }
 
 void Chatbox::inputValid(QString const& text) {
@@ -70,7 +73,7 @@ void Chatbox::parseString(QString str) {
 		return;
 	}
 	str[0] = ' ';
-	str = str.trimmed();
+	str = str.trimmed().toLower();
 	QStringList list = str.split(QRegExp("\\s+"));
 	QStringList::const_iterator it = list.begin();
 	if (it->contains(rgxPos)) {
@@ -81,7 +84,7 @@ void Chatbox::parseString(QString str) {
 		emit undo();
 	} else if (*it == "kill" || *it == "k") {
 		if (++it == list.end() || !it->contains(rgxPos))
-			tbCBox_->append("Expected position as second argument.");
+			display("Expected position as second argument.");
 		else
 			emit kill(Position(*it));
 	} else if (*it == "exit" || *it == "e") {
@@ -96,11 +99,29 @@ void Chatbox::parseString(QString str) {
 		emit cl_connect();
 	} else if (*it == "disconnect" || *it == "dc") {
 		emit cl_disconnect();
+	} else if (*it == "yes" || *it == "y") {
+		emit confirm(true);
+	} else if (*it == "no" || *it == "n") {
+		emit confirm(false);
 	} else if (*it == "save" || *it == "s") {
 		if (++it == list.end())
-			tbCBox_->append("Expected filename as second argument.");
+			display("Expected filename as second argument.");
 		else
 			emit writeLogToDisk(*it);
+	} else if (*it == "help" || *it == "h" ) {
+		display("4DGo -- A four-dimensional goban for online play.");
+		display("All commands start with a '!'. Any input that does not is treated as a chat message. All comands are case-insensitive.");
+		display("  Commands:");
+		display("!connect [hostname] [port]: connect to the game server. By default, localhost:15493 will be used.");
+		display("!disconnect: break connection to server and clear the goban.");
+		display("!A4d4: on slice A4 (top-left), on intersection d4 (top-right).");
+		display("!pass: end your turn without playing a stone.");
+		display("!undo: request that your last move be undone.");
+		display("!yes: allow the action your opponent requested (usually an undo or kill).");
+		display("!yes: refuse to allow the action your opponent requested (usually an undo or kill).");
+		display("!kill: request a certain group to be immediately taken off the board. Useful in endgame, to not need to play out all captures.");
+		display("!save filename: save the current history to file filename.");
+		display("!exit: disconnect and close the window.");
 	} else {
 		tbCBox_->append(QString("Unknown command: ")+*it);
 	}

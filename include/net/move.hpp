@@ -11,10 +11,10 @@
 namespace fdgo {
 namespace net {
 
-//! \brief Base class for sending and receiving messages.
+//! \brief Message for denoting moves. 
 
 class Move : public Object {
-    public:
+  public:
 	typedef boost::shared_ptr<Move> Pointer;
 
 	Move(); 
@@ -23,7 +23,7 @@ class Move : public Object {
 	
 	fdgo::Move mv;
 
-    protected:
+  protected:
 	void printOn(QDataStream& ds) const;
 	void readFrom(QDataStream& ds);
 };

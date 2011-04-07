@@ -25,12 +25,14 @@ class Chatbox;
 class Goban;
 class Info;
 
+//! Currently acts as the main window.
+
 class MainWidget : public QWidget {
 	Q_OBJECT
-    public:
+  public:
 	MainWidget(QWidget* parent = 0);
 
-    private:
+  private:
 	QVBoxLayout* vlMain_;
 	QHBoxLayout* hlGobanInfo_;
 	Goban* goban_;
@@ -39,6 +41,7 @@ class MainWidget : public QWidget {
 	QVBoxLayout* vlInfo_;
 	QFormLayout* flInfo_;
 	QFrame* lnInfo_;
+	QPushButton* btnConnect_;
 	QPushButton* btnPass_;
 	QPushButton* btnUndo_;
 	QPushButton* btnExit_;

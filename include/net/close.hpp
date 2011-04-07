@@ -10,15 +10,15 @@
 namespace fdgo {
 namespace net {
 
-//! \brief Base class for sending and receiving messages.
+//! \brief Message sent to warn that the connection will be closed.
 
 class CloseConnection : public Object {
-    public:
+  public:
 	typedef boost::shared_ptr<CloseConnection> Pointer;
 
 	CloseConnection(); 
 	CloseConnection(Header const& header);
-    protected:
+  protected:
 	void printOn(QDataStream& ds) const;
 	void readFrom(QDataStream& ds);
 };

@@ -13,6 +13,8 @@ namespace server {
 //!
 //! This is an abstraction for the client side of the server-client
 //! connection.
+//!
+//! \deprecated
 
 
 class Connection : public boost::enable_shared_from_this<Connection> {

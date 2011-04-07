@@ -13,6 +13,7 @@ ADD_DEFINITIONS( " -ggdb -Wall -Wextra -pedantic -std=c++0x -Winline
 SET( NETWORK_SOURCES
 	net/header net/object net/null net/greeting net/error "net/message"
 	net/move net/undo net/turn net/history net/close net/factory
+	net/setting net/confirm
 	)
 
 SET( SHARED_SOURCES

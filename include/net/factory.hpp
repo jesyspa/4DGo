@@ -9,8 +9,10 @@
 namespace fdgo {
 namespace net {
 
+//! \brief An instance of this class generates classes from incoming packets.
+
 class Factory {
-    public:
+  public:
 	Object::Pointer makeFromIncoming();
 
 	Factory(QTcpSocket* sock = 0); 
@@ -19,7 +21,7 @@ class Factory {
 	void setSock(QTcpSocket* sock);
 	bool hasMore();
 
-    private:
+  private:
 	Header* header_;
 	QTcpSocket* sock_;
 };

@@ -16,6 +16,8 @@ Header::HType Object::getType() const {
 
 
 void Object::write(QTcpSocket* sock) const {
+	if (!sock)
+		return;
 	QByteArray block;
 	QDataStream out(&block, QIODevice::WriteOnly);
 	out.setVersion(QDataStream::Qt_4_6);

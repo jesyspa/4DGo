@@ -46,14 +46,14 @@ struct ExcEOF : ExcFatal {
 };
 
 
-struct ExcSafeDisconnect : ExcFatal {
+struct ExcSafeDisconnect : ExcNonFatal {
 	ExcSafeDisconnect() {
 		*this << type_err_msg("Remote host closed connection safely (but still unexpectedly).");
 	}
 
 };
 
-struct ExcDisconnect : ExcFatal {
+struct ExcDisconnect : ExcNonFatal {
 	ExcDisconnect() {
 		*this << type_err_msg("Remote host closed connection unexpectedly.");
 	}

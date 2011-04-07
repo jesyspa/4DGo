@@ -12,12 +12,14 @@ namespace fdgo {
 namespace client {
 namespace gui {
 
+//! \brief Displays information about the game.
+
 class Info : public QWidget {
 	Q_OBJECT
-    public:
+  public:
 	Info(QWidget* parent = 0);
 
-    public slots:
+  public slots:
 	void setColour(bool black);
 	void setTurn(bool black);
 	void setKomi(double komi);
@@ -25,7 +27,7 @@ class Info : public QWidget {
 	void setWhiteCaps(int caps);
 	void setConnection(QString const& str);
 
-    private:
+  private:
 	QFormLayout* flInfo_;
 	QLabel* lblColour_;
 	QLabel* lblColourVal_;

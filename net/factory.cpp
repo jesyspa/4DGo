@@ -60,6 +60,12 @@ Object::Pointer Factory::makeFromIncoming() {
 		case Header::History:
 			p.reset(new History(*header_));
 			break;
+		case Header::Setting:
+			p.reset(new Setting(*header_));
+			break;
+		case Header::Confirmation:
+			p.reset(new Confirmation(*header_));
+			break;
 		case Header::CloseConnection:
 			p.reset(new CloseConnection(*header_));
 			break;

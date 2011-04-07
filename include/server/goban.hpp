@@ -15,21 +15,27 @@ namespace server {
 class Intersection;
 
 //! \brief Interface to work with the goban.
+//!
+//! All game logic is done through here.
 
 class Goban {
 	// Explicitly forbidden
 	Goban(Goban const&);
 	Goban& operator=(Goban const&);
-    public:
+  public:
 	Goban(History& mem);
 	~Goban();
 	void placeStone(bool black, Position const& pos);
 	void removeStone(Position const& pos);
 	void killGroup(Position const& pos);
 	void noteStoneRemoval(Intersection* itr, bool black);
-	Score makeScore();
+	//! \brief Calculates and returns the score.
+	//!
+	//! At the moment, this leads to severe changes in the board position, and
+	//! it becomes impossible to play any further.
+	Score makeScore(); 
 
-    private:
+  private:
 	Intersection* getIntersection(Position const& pos);
 	Position getPosition(Intersection* itr);
 	Neighbours::Pointer makeNeighbours(Position const& pos);

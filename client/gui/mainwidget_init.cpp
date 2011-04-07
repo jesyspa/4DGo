@@ -44,6 +44,10 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent) {
 				lnInfo_->setFrameShadow(QFrame::Sunken);
 				vlInfo_->addWidget(lnInfo_);
 
+				btnConnect_ = new QPushButton(tr("&Connect"), this);
+				btnConnect_->setObjectName(QString::fromUtf8("btnConnect_"));
+				vlInfo_->addWidget(btnConnect_);
+
 				btnPass_ = new QPushButton(tr("&Pass"), this);
 				btnPass_->setObjectName(QString::fromUtf8("btnPass_"));
 				vlInfo_->addWidget(btnPass_);
@@ -68,13 +72,26 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent) {
 		vlMain_->addWidget(cbox_);
 	// }
 
-	QWidget::setTabOrder( cbox_, btnPass_ );
-	QWidget::setTabOrder( btnPass_, btnUndo_ );
-	QWidget::setTabOrder( btnUndo_, btnExit_ );
-	QWidget::setTabOrder( btnExit_, cbox_ );
+	QWidget::setTabOrder(cbox_, btnUndo_);
+	QWidget::setTabOrder(btnUndo_, btnPass_);
+	QWidget::setTabOrder(btnPass_, btnExit_);
+	QWidget::setTabOrder(btnExit_, cbox_);
 
 	client_ = new Client(this);
 
+
+	connect( btnConnect_, SIGNAL(clicked()),
+	             client_, SLOT(  cl_connect())
+	       );
+	connect(    btnUndo_, SIGNAL(clicked()),
+	             client_, SLOT(  undo())
+	       );
+	connect(    btnPass_, SIGNAL(clicked()),
+	             client_, SLOT(  pass())
+	       );
+	connect(    btnExit_, SIGNAL(clicked()),
+	             client_, SLOT(  exit())
+	       );
 	connect(       cbox_, SIGNAL(message(QString const&)),
 	             client_, SLOT(  message(QString const&))
 	       );
@@ -89,6 +106,9 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent) {
 	       );
 	connect(       cbox_, SIGNAL(exit()),
 	             client_, SLOT(  exit())
+	       );
+	connect(       cbox_, SIGNAL(confirm(bool)),
+	             client_, SLOT(  confirm(bool))
 	       );
 	connect(       cbox_, SIGNAL(setHost(QString const&)),
 	             client_, SLOT(  setHost(QString const&))

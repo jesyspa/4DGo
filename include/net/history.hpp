@@ -10,16 +10,13 @@
 namespace fdgo {
 namespace net {
 
-//! \brief An object of this class is sent to the client to inform it of the
-//!        details of this game.
+//! \brief Message that contains instructions on what to do with history.
 //!
-//! Current layout:\n
-//! uint8_t black
-//! 
-//! double komi
+//! Should only ever be sent from server to client. Not sure how to ensure
+//! that.
 
 class History : public Object {
-    public:
+  public:
 	typedef boost::shared_ptr<History> Pointer;
 
 	enum AType {
@@ -33,7 +30,7 @@ class History : public Object {
 	History(int action);
 	History(Header const& header);
 
-    protected:
+  protected:
 	void printOn(QDataStream& ds) const;
 	void readFrom(QDataStream& ds);
 };

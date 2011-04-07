@@ -8,7 +8,7 @@
 namespace fdgo {
 namespace server {
 
-Stone::Stone(Intersection* intrPtr, bool black) : chain_(0), intrPtr_(intrPtr), libs(8), black_(black) {
+Stone::Stone(Intersection* intrPtr, bool black) : chain_(0), intrPtr_(intrPtr), black_(black), libs(8) {
 	connectToNeighbours();
 	seeIfAnyoneIsDead();
 }
@@ -105,6 +105,25 @@ void Stone::getChain(QList<Chain*>& chvec, Intersection* p) {
 		if (p->stone_->chain_ == chvec[i])
 			return;
 	chvec.push_back(p->stone_->chain_);
+}
+
+void Stone::spawnMore() {
+	spawn(intrPtr_->nbr_->up);
+	spawn(intrPtr_->nbr_->down);
+	spawn(intrPtr_->nbr_->left);
+	spawn(intrPtr_->nbr_->right);
+	spawn(intrPtr_->nbr_->farup);
+	spawn(intrPtr_->nbr_->fardown);
+	spawn(intrPtr_->nbr_->farleft);
+	spawn(intrPtr_->nbr_->farright);
+}
+
+void Stone::spawn(Intersection* p) {
+	if (!p)
+		return;
+	if (p->stone_)
+		return;
+	p->stone_ = new Stone(p, black_);
 }
 
 }
