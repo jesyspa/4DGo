@@ -10,7 +10,6 @@
 #include <exceptions.hpp>
 
 namespace po = boost::program_options;
-using boost::asio::ip::tcp;
 
 namespace fdgo {
 namespace server {

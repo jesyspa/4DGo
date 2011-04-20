@@ -2,7 +2,6 @@
 #define FDGO_INCLUDE_NET_MOVE_HPP
 
 #include <boost/array.hpp>
-#include <boost/asio.hpp>
 #include <net/object.hpp>
 #include <net/header.hpp>
 #include <move.hpp>

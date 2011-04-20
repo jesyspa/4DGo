@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/asio.hpp>
 #include <net/object.hpp>
 #include <net/header.hpp>
 
